@@ -17,30 +17,13 @@ def spec_lmk2J(l, m, k, lmax=100):
 
 def spec_J2lmk(J, lmax=100):
     nk = (lmax+1)**2
-    k = _np.int(J/nk)
-    l = _np.int(_np.sqrt(J - k*nk))
-    m = J - k*nk - l**2 - l
+    k = _np.floor(J/nk).astype(_np.int)
+    l = _np.floor(_np.sqrt(J - k*nk)).astype(_np.int)
+    m = (J - k*nk - l**2 - l).astype(_np.int)
     return (l, m, k)
 
-def save_mode(filename, mode):
-    print('saving mode:', filename)
-    mode_arr = _np.empty((3,3)+mode[0][0].to_array().shape, dtype=_np.complex)
-    for i in range(3):
-        for j in range(3):
-            mode_arr[i, j] = mode[i][j].to_array()
-    _np.save(filename, mode_arr)
-
-def load_mode(filename, axis=2):
-    data = _np.load(filename)
-    mode_arr = data['mode_arr']
-    #mode = _np.empty(mode_arr.shape[:axis])
-    #for i, _ in _np.ndenumerate(mode):
-    #    mode[i] = _psh.SHCoeffs.from_array(mode_arr[i,:])
-    data.close()
-    return mode_arr
-
 # create full matrix C
-def create_Cmat(lmax, mode_lmax, MU=100, NU=0.25, m_max=3, Cmat_file=None, recalc=True, etol=1e-8):
+def create_Cmat(lmax, mode_lmax, MU=100, NU=0.25, m_max=3,shtype='irr', Cmat_file=None, recalc=True, etol=1e-8):
     if not (Cmat_file is None):
         if recalc or (not os.path.exists(Cmat_file)):
             print('Integrating traction modes to a matrix')
@@ -50,25 +33,27 @@ def create_Cmat(lmax, mode_lmax, MU=100, NU=0.25, m_max=3, Cmat_file=None, recal
             Cmat = _spm.lil_matrix( (size_row, size_col), dtype=_np.complex_)
             c_omega = 1.0
 
-            for k in range(m_max):
-                tic_k = _time.time()
-                for l in range(mode_lmax+1):
-                    tic_l = _time.time()
-                    for m in range(-l, l+1):
-                        tic = _time.time()
+            for l in range(mode_lmax+1):
+                tic_l = _time.time()
+                if l == 56:
+                    recalc = True
+                for m in range(-l, l+1):
+                    tic_m = _time.time()
+                    for k in range(m_max):
+                        tic_k = _time.time()
                         Tlm_vec = _np.empty(3*(lmax+1)**2)*0j
-                        T_K, S_K = _she.T_mode(l, m, k, MU, NU, c_omega=c_omega, shtype='irr',\
+                        T_K, S_K = _she.T_mode(l, m, k, MU, NU, c_omega=c_omega, shtype=shtype,\
                                                lmax=lmax, stress=True, recalc=recalc, etol=etol)
                         for i in range(3):
                             Tlm_vec_i = SHCilmToVector(T_K[i].to_array(), lmax=lmax)
                             Tlm_vec[i*(lmax+1)**2:(i+1)*(lmax+1)**2] = Tlm_vec_i
                         Cmat[:, spec_lmk2J(l, m, k, lmax=mode_lmax)] = _np.matrix(Tlm_vec).T
-                        toc = _time.time()
-                        print(k, l, m, toc-tic)
-                    toc_l = _time.time()
-                    print (k, l, toc_l-tic_l)
-                toc_k = _time.time()
-                print ('k =', k, toc_k-tic_k)
+                        toc_k = _time.time()
+                        print(l, m, k, toc_k-tic_k)
+                    toc_m = _time.time()
+                    print (l, m, toc_m-tic_m)    
+                toc_l = _time.time()
+                print ('l =', l, toc_l-tic_l)
             _sp.io.savemat(Cmat_file, {'Cmat': Cmat})
         else:
             Cmat = _sp.io.loadmat(Cmat_file)['Cmat']
@@ -159,12 +144,47 @@ def print_SH_mode(vec, m_dir=4, etol=1e-8, verbose=True):
             idx_mode = _np.append(idx_mode, new_idx)
     return idx_mode
 
-def stress_solution(index_sol, X, Y, Z, MU=100, NU=0.25, lmax=100, recalc=False, verbose=True):
+def stress_solution(index_sol, X, Y, Z, MU=100, NU=0.25, lmax=100, shtype='irr', recalc=False, verbose=True):
     R = _np.sqrt(X**2+Y**2+Z**2)
     THETA = _np.arccos(Z/R)
     PHI = _np.arctan2(Y, X)
     sigma_tot = _np.zeros(X.shape+(3,3))*(0j)
     Slm_dir = 'Slm_SH_mu'+str(MU)+'_nu'+str(NU)
+    if verbose:
+        print('the stress solution includes: ')
+        print('l m k coeff')
+    for idx_sol in index_sol:
+        l, m, k = idx_sol['index']
+        c_omega = idx_sol['coeff']
+        if verbose:
+            print(l, m, k, c_omega)
+        sigma = _np.zeros(X.shape+(3,3))*(0j)
+        Slm = _she.S_mode(l, m, k, MU, NU, c_omega=c_omega, shtype=shtype, lmax=lmax, recalc=recalc)
+        for idx in _np.ndindex(X.shape):
+            lat_d = 90-THETA[idx]/_np.pi*180
+            lon_d = PHI[idx]/_np.pi*180
+            for u in range(3):
+                for v in range(3):
+                    Slm_uv = Slm[u][v].to_array()
+                    sigma_uv = _psh.expand.MakeGridPointC(Slm_uv, lat_d, lon_d)
+                    sigma[idx+(u,v)] = sigma_uv
+            if shtype == 'irr':
+                sigma[idx] /= R[idx]**(l+2)
+            else:
+                sigma[idx] *= R[idx]**(l-1)
+        sigma_tot = sigma_tot + sigma # sigma(r,theta,phi)
+    return sigma_tot
+
+def fast_stress_solution(index_sol, X, Y, Z, MU=100, NU=0.25, lmax=100, recalc=False, verbose=True):
+    # do not use
+    R = _np.sqrt(X**2+Y**2+Z**2)
+    THETA = _np.arccos(Z/R)
+    PHI = _np.arctan2(Y, X)
+    sigma_tot = _np.zeros(X.shape+(3,3))*(0j)
+    for u in range(3):
+        for v in range(3):
+            dictidx = index_sol['dict']
+            c_omega = index_sol['coeff']
     if verbose:
         print('the stress solution includes: ')
         print('l m k coeff')

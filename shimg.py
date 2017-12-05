@@ -13,10 +13,13 @@ sigma_inf = np.swapaxes(data['S'], 0, 1)
 a = data['R']
 mu = data['MU']
 nu = data['NU']
-b = 1
 b1 = data['b1']
 x1 = data['x1']
 x2 = data['x2']
+
+r0 = a; b0 = b1; x01 = x1; x02 = x2; sigma_0 = sigma_inf;
+a = a/r0; b1 = b0/r0; x1 = x01/r0; x2 = x02/r0; sigma_inf = sigma_0/r0**2
+
 
 #### generate meshing on the void surface
 print('generate meshing on the void surface')
@@ -71,12 +74,14 @@ print('evaluate stress solution and nodal force')
 nseg, m = b1.shape
 f1 = np.zeros(x1.shape)
 f2 = np.zeros(x2.shape)
-xi = x2 - x1
-sigma_1 = stress_solution(index_sol, x1[:, 0], x1[:, 1], x1[:, 2], MU=mu, NU=nu, lmax=lmax_sub, recalc=False, verbose=False).real
-sigma_2 = stress_solution(index_sol, x2[:, 0], x2[:, 1], x2[:, 2], MU=mu, NU=nu, lmax=lmax_sub, recalc=False, verbose=False).real
+xi = x02 - x01
+norm_xi = np.tile(np.linalg.norm(xi, axis=1), (3, 1)).T
+xi = xi/norm_xi
+sigma_1 = stress_solution(index_sol, x1[:, 0], x1[:, 1], x1[:, 2], MU=mu, NU=nu, lmax=lmax_sub, recalc=False, verbose=False).real*r0**2
+sigma_2 = stress_solution(index_sol, x2[:, 0], x2[:, 1], x2[:, 2], MU=mu, NU=nu, lmax=lmax_sub, recalc=False, verbose=False).real*r0**2
 
 for i in range(nseg):
-    f1[i, :] = np.cross(np.dot(sigma_1[i, :, :], b1[i, :]), xi[i, :])
-    f2[i, :] = np.cross(np.dot(sigma_2[i, :, :], b1[i, :]), xi[i, :])
+    f1[i, :] = np.cross(np.dot(sigma_1[i, :, :], b0[i, :]), xi[i, :])
+    f2[i, :] = np.cross(np.dot(sigma_2[i, :, :], b0[i, :]), xi[i, :])
 
 savemat('fimg.mat', {'fi0': f1, 'fi1': f2})

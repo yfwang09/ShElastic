@@ -8,7 +8,7 @@ from SHGrad import VSH1, VSH2
 
 def U_mode(l, m, k, mu=0.5, nu=None, c_omega=1.0, r=1.0, shtype='irr', lmax=100, recalc=False, etol=1e-8):
     dir_Umode  = 'Umode'
-    file_Umode = os.path.join(dir_Umode, 'U_l%d_m%d_k%d.npz' % (l, m, k))
+    file_Umode = os.path.join(dir_Umode, 'U'+shtype+'l%dm%dk%d.npz' % (l, m, k))
     if os.path.exists(file_Umode) and (not recalc):
         U_nu, d = loadmode(_np.load(file_Umode)['load_Unu'], lmax)
         U_0,  d = loadmode(_np.load(file_Umode)['load_U0'] , lmax)
@@ -58,7 +58,7 @@ def gradU(U, c1, c2):
 
 def S_mode(l, m, k, mu=0.5, nu=None, c_omega=1.0, r=1.0, shtype='irr', lmax=100, recalc=False, etol=1e-8):
     dir_Smode  = 'Smode'
-    file_Smode = os.path.join(dir_Smode, 'S_l%d_m%d_k%d.npz' % (l, m, k))
+    file_Smode = os.path.join(dir_Smode, 'S'+shtype+'l%dm%dk%d.npz' % (l, m, k))
     if os.path.exists(file_Smode)  and (not recalc):
         S_nu1, d = loadmode(_np.load(file_Smode)['load_Snu1'], lmax)
         S_nu2, d = loadmode(_np.load(file_Smode)['load_Snu2'], lmax)

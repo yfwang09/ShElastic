@@ -119,3 +119,35 @@ def void_screw_disl(nmax, zs, ts, mu1, mu2, nu1=0.25, nu2=0.25, a=1, b=1):
     # After experiment, the implementation in Takahashi&Ghoniem(2008) is unnormalized Legendre Polynomial
     p = Legendre_poly(n, z, _psh.legendre.PLegendreA,dl = _np.array([1, 1, 3, 3]),dm = _np.array([-1,1, 1,-1]), csphase=-1)
     return _np.sum(C_term1*p[:,:,:,0] + C_term2*p[:,:,:,1] + C_term3*p[:,:,:,2] + C_term4*p[:,:,:,3], axis=1)
+
+def gavazza1974(nmax, zs, ts, mu1, mu2, nu1=0.25, nu2=0.25, a=1, b=1):
+    # this version gets rid of the round-off errors
+    ns = np.arange(nmax)+1
+    n, z, t = np.meshgrid(ns, zs, ts)
+    r = np.sqrt(z**2 + t**2)
+    ct = z/r
+    lambda1 = 2*mu1*nu1/(1-2*nu1)
+    lambda2 = 2*mu2*nu2/(1-2*nu2)
+
+    Kn = -(lambda1+mu1)/2/((n+2)*lambda1+(3*n+5)*mu1)
+    EnI = 1/(2*n+1)*((n-1)*lambda1 - (n+4)*mu1)/((n+2)*lambda1+(3*n+5)*mu1)
+    eta_n = b/2/np.pi * ((-2)**n) *factorial(n)/factorial(2*n)
+    #eta_n = b/2/np.pi * (-1)**(n%2) * np.exp(np.sum(np.log(2/np.arange(n+1, 2*n+1))))
+
+    Cab = (mu1-mu2)/(mu1*(n+2)+mu2*(n-1))
+    denom_ab = mu1*((n+2) + EnI*(2*n+1)*(n+1)) + mu2*2*n
+    a_t_n = (a/t)**n
+    alpha_n = Cab/denom_ab * (mu1*((n+2) - EnI*(2*n+1)*(n-1))) * a_t_n
+    beta_n = -Cab/denom_ab * (mu1*((n+2) + EnI*(2*n+1)*(n-1)) + 2*mu2*(n-1)) * a_t_n
+
+    Omega_n = 2*(mu1-mu2)* a_t_n * ((a/r)**(n+1)) / denom_ab
+
+    # After experiment, the implementation in Takahashi&Ghoniem(2008) is unnormalized Legendre Polynomial
+    p = Legendre_poly(n, ct, pyshtools.legendre.PLegendreA,dl=[1, 1, 2, 2, 3, 3], dm=[-1, 1, 1, -1, 1, -1], csphase=-1)
+    term1 = -(a/r)**(n+1) * (2*alpha_n/r * p[:,:,:,0] + beta_n/2/r * (p[:,:,:,1]+2*p[:,:,:,0]))
+    term2 = 2*((a/r)**2-1)*Kn*Omega_n/r * (p[:,:,:,4]+12*p[:,:,:,5])
+    term3 = Kn*Omega_n/r * ct * (p[:,:,:,2] + 6*p[:,:,:,3])
+    sol = mu1*(term1 + term2 + term3)*eta_n
+    #sol = mu*b*(term2)
+    return np.sum(sol, axis=1)
+

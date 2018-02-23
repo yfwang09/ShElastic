@@ -27,11 +27,12 @@ def SHMultiplyC(sh1, sh2, lmax=100, norm='4pi', csphase=1):
     return SHProd.to_array()
 
 ###  VSH1, VSH2 ###
-# The function will take a spherical harmonic coefficient class,
+# The function will take a spherical harmonic coefficient array,
 # multiply by the normal vector, and return the first/second vector
 # spherical harmonic result.
 
-def VSH1(clm):
+def VSH1(coeffs, norm='4pi', csphase=1):
+    clm = _psh.SHCoeffs.from_array(coeffs, normalization=norm, csphase=csphase)
     grid = clm.expand('GLQ')
     grid_data = grid.data
     latglq, longlq = _psh.expand.GLQGridCoord(clm.lmax)
@@ -46,7 +47,8 @@ def VSH1(clm):
     grid.data = grid_data * _np.cos(THETA)
     Y_z = grid.expand()
 
-    return (Y_x, Y_y, Y_z)
+    Y = _np.stack((Y_x.to_array(), Y_y.to_array(), Y_z.to_array()), axis=-1)
+    return Y
 
 def DiffNormCoeffs(lmax, norm=None, csphase=1, shtype='irr'):
     
@@ -54,7 +56,7 @@ def DiffNormCoeffs(lmax, norm=None, csphase=1, shtype='irr'):
         print('csphase == -1 is not implemented!')
 
     # first we create a list of l, m degrees lower than lmax
-    l_list, m_list = LM_list(lmax)
+    l_list, m_list = LM_list(lmax - 1)
     if shtype == 'irr':
         l_d = l_list + 1
     elif shtype == 'reg':
@@ -147,20 +149,14 @@ def ISHgrad(clm, r=1.0):
 
     return (clm_dx, clm_dy, clm_dz)
 
-def VSH2(clm):
+def VSH2(coeffs, norm='4pi', csphase=1):
+    clm = _psh.SHCoeffs.from_array(coeffs, normalization=norm, csphase=csphase)
     clm_dx, clm_dy, clm_dz = ISHgrad(clm)
+    dcoeffs = _np.stack((clm_dx.to_array(), clm_dy.to_array(), clm_dz.to_array()), axis=-1)
 
     # the first spherical harmonic part
     l_list, m_list = LM_list(clm.lmax+1)
     lp1 = _np.swapaxes(_np.broadcast_to(_np.arange(clm.lmax+1)+1, (2, clm.lmax+1, clm.lmax+1)), 1,2)
-    clm_lp1 = clm.copy()
-    clm_lp1.coeffs = clm.to_array()*lp1
-    lp1_Y_x, lp1_Y_y, lp1_Y_z = VSH1(clm_lp1)
-    #print(clm_dz.to_array())
-    #print(Y_z.to_array())
-    #print(C_lp1.to_array())
-    clm_dx.coeffs = clm_dx.to_array() + lp1_Y_x.to_array()
-    clm_dy.coeffs = clm_dy.to_array() + lp1_Y_y.to_array()
-    clm_dz.coeffs = clm_dz.to_array() + lp1_Y_z.to_array()
+    lp1_Y = VSH1(coeffs*lp1, norm=norm, csphase=csphase)
 
-    return (clm_dx, clm_dy, clm_dz)
+    return dcoeffs + lp1_Y

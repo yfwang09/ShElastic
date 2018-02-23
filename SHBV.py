@@ -1,94 +1,113 @@
 import numpy as _np
 import scipy as _sp
 import scipy.sparse as _spm
+from scipy.special import sph_harm
 import matplotlib.pyplot as _plt
-import pyshtools as _psh
-import ShElastic as _she
-from SHUtil import SHCilmToVector
-import time as _time
-import sys, os
+from scipy.interpolate import SmoothSphereBivariateSpline
+from SHUtil import SHCilmToVector, CartCoord_to_SphCoord, K2lmk
+from time import time
 
-###  spec_lmk2J, spec_J2lmk ###
-# Given lmax, transform between (l,m,k) degrees and column number K
+def generate_submat(mu, nu, fullmat, lKmax, lJmax,\
+                    lKfull=None, lJfull=None, kK=3, kJ=3, verbose=False):
+    if lKfull is None:
+        M, N = fullmat.shape
+        lKfull = _np.sqrt(N/kK).astype(_np.int)-1;
+        lJfull = _np.sqrt(M/kJ).astype(_np.int)-1;
 
-def spec_lmk2J(l, m, k, lmax=100):
-    nk = (lmax+1)**2
-    return k*nk + l**2 + (m + l)
+    LJfull = (lJfull+1)**2; LKfull = (lKfull+1)**2;
+    LJmax = (lJmax+1)**2;   LKmax = (lKmax+1)**2;
+    full_row = kJ*LJfull;   full_col = kK*LKfull;
+    size_row = kJ*LJmax;    size_col = kK*LKmax;
+    if verbose:
+        print('Integrating modes to a matrix')
+        print(size_row, size_col)
+    #fullmat =_spm.lil_matrix(fullmat)
+    #submat = _spm.lil_matrix( (size_row, size_col), dtype=fullmat.dtype)
+    mat_blocks = [[None for _ in range(kK)] for _ in range(kJ)]
+    for kj in range(kJ):
+        for kk in range(kK):
+            r1 = kj*LJmax; r2 = r1+LJmax; c1 = kk*LKmax; c2 = c1+LKmax;
+            R1 = kj*LJfull;R2 = R1+LJmax; C1 = kk*LKfull;C2 = C1+LKmax;
+            mat_blocks[kj][kk] = fullmat[R1:R2, C1:C2]
+    submat = _spm.bmat(mat_blocks)
+    return submat
 
-def spec_J2lmk(J, lmax=100):
-    nk = (lmax+1)**2
-    k = _np.floor(J/nk).astype(_np.int)
-    l = _np.floor(_np.sqrt(J - k*nk)).astype(_np.int)
-    m = (J - k*nk - l**2 - l).astype(_np.int)
-    return (l, m, k)
+def print_SH_mode(vec, m_dir=4, etol=1e-8, verbose=True):
+    # vec is a *complex* spherical harmonic vector
+    # with m different directions
+    idx_type = [('index', '<i4', 3), ('coeff', _np.complex_)]
+    idx_mode = _np.array([], dtype=idx_type)
+    lmax = _np.int(_np.sqrt(vec.size / m_dir)) - 1
+    idx = [K2lmk(i, lmax) for i in range(vec.size)]
+    for i in range(vec.size):
+        if (_np.abs(_np.real(vec[i])) > etol or \
+            _np.abs(_np.imag(vec[i])) > etol):
+            if verbose:
+                print('index:',i, idx[i], 'coeff:', vec[i])
+            new_idx = _np.array((idx[i], vec[i]), dtype=idx_type)
+            idx_mode = _np.append(idx_mode, new_idx)
+    return idx_mode
 
-# create full matrix C
-def create_Cmat(lmax, mode_lmax, MU=100, NU=0.25, m_max=3,shtype='irr', Cmat_file=None, recalc=True, etol=1e-8):
-    if not (Cmat_file is None):
-        if recalc or (not os.path.exists(Cmat_file)):
-            print('Integrating traction modes to a matrix')
-            size_row = 3*(lmax+1)**2
-            size_col = m_max*(mode_lmax+1)**2
-            print(size_row, size_col)
-            Cmat = _spm.lil_matrix( (size_row, size_col), dtype=_np.complex_)
-            c_omega = 1.0
-
-            for l in range(mode_lmax+1):
-                tic_l = _time.time()
-                if l == 56:
-                    recalc = True
-                for m in range(-l, l+1):
-                    tic_m = _time.time()
-                    for k in range(m_max):
-                        tic_k = _time.time()
-                        Tlm_vec = _np.empty(3*(lmax+1)**2)*0j
-                        T_K, S_K = _she.T_mode(l, m, k, MU, NU, c_omega=c_omega, shtype=shtype,\
-                                               lmax=lmax, stress=True, recalc=recalc, etol=etol)
-                        for i in range(3):
-                            Tlm_vec_i = SHCilmToVector(T_K[i].to_array(), lmax=lmax)
-                            Tlm_vec[i*(lmax+1)**2:(i+1)*(lmax+1)**2] = Tlm_vec_i
-                        Cmat[:, spec_lmk2J(l, m, k, lmax=mode_lmax)] = _np.matrix(Tlm_vec).T
-                        toc_k = _time.time()
-                        print(l, m, k, toc_k-tic_k)
-                    toc_m = _time.time()
-                    print (l, m, toc_m-tic_m)    
-                toc_l = _time.time()
-                print ('l =', l, toc_l-tic_l)
-            _sp.io.savemat(Cmat_file, {'Cmat': Cmat})
-        else:
-            Cmat = _sp.io.loadmat(Cmat_file)['Cmat']
+def fast_displacement_solution(aK, X, Y, Z, Umodes, lKmax=50, lJmax=53, shtype='irr', verbose=True):
+    R, THETA, PHI = CartCoord_to_SphCoord(X, Y, Z)
+    disp = _np.zeros(X.shape+(3,lKmax+1), dtype=_np.complex)
+    lats = _np.pi/2-THETA; lat_d = _np.rad2deg(lats); 
+    lons = PHI;            lon_d = _np.rad2deg(lons); 
+    ## Multiply the modes U_K by a_K
+    M, N = Umodes.shape;
+    UK = Umodes*_spm.diags(aK, shape=(aK.size, aK.size))
+    ## Combine the columns with same l
+    mode_l, mode_m, mode_k = K2lmk(_np.arange(N, dtype=_np.int), lmax=lKmax)
+    lmodes = _np.arange(lKmax+1, dtype=_np.int)
+    map_L = _spm.csr_matrix(mode_l[:,_np.newaxis] == lmodes, dtype=_np.int)
+    Ul = UK.dot(map_L).tocsc()
+    for lmode in lmodes:
+        Js = Ul[:,lmode].nonzero()[0]
+        if Js.size > 0:
+            ls, ms, ks = K2lmk(Js, lmax=lJmax)
+            us = ks%3; # us = ((ks-vs)/3).astype(_np.int)
+            for u in range(3):
+                modes_u = (u == us)
+                values = Ul[Js,lmode].toarray().flatten()[modes_u]
+                disp_u = sph_harm(ms[modes_u], ls[modes_u], PHI[...,_np.newaxis], THETA[...,_np.newaxis])
+                disp[...,u,lmode] = _np.sum(disp_u*((-1.)**ms[modes_u])*values*_np.sqrt(4*_np.pi), axis=-1)
+    if shtype == 'irr':
+        disp /= R[...,_np.newaxis,_np.newaxis]**(lmodes+1)
     else:
-        print('create_Cmat: Must provide matrix file name!')
-        Cmat = -1
-
-    return Cmat
-
-# sub matrix of C
-def subCmat(Cmat, lmax, mode_lmax, lmax_sub, mode_sub, m_max=3, Csub_file=None, verbose=True):
-    if (not (Csub_file is None)) and (os.path.exists(Csub_file)):
-        Csub = _sp.io.loadmat(Csub_file)['Cmat']
+        disp *= R[...,_np.newaxis,_np.newaxis]**(lmodes)
+    return disp.sum(axis=-1).real
+    
+def fast_stress_solution(aK, X, Y, Z, Smodes, lKmax=50, lJmax=53, shtype='irr', verbose=True):
+    R, THETA, PHI = CartCoord_to_SphCoord(X, Y, Z)
+    sigma = _np.zeros(X.shape+(3,3,lKmax+1), dtype=_np.complex)
+    lats = _np.pi/2-THETA; lat_d = _np.rad2deg(lats); 
+    lons = PHI;            lon_d = _np.rad2deg(lons); 
+    ## Multiply the modes S_K by a_K
+    M, N = Smodes.shape;
+    SK = Smodes*_spm.diags(aK, shape=(aK.size, aK.size))
+    ## Combine the columns with same l
+    mode_l, mode_m, mode_k = K2lmk(_np.arange(N, dtype=_np.int), lmax=lKmax)
+    lmodes = _np.arange(lKmax+1, dtype=_np.int)
+    map_L = _spm.csr_matrix(mode_l[:,_np.newaxis] == lmodes, dtype=_np.int)
+    Sl = SK.dot(map_L).tocsc()
+    for lmode in lmodes:
+        Js = Sl[:,lmode].nonzero()[0]
+        if Js.size > 0:
+            ls, ms, ks = K2lmk(Js, lmax=lJmax)
+            vs = ks%3; us = ((ks-vs)/3).astype(_np.int)
+            for u in range(3):
+                for v in range(3):
+                    modes_uv = _np.logical_and(u == us, v == vs)
+                    values = Sl[Js,lmode].toarray().flatten()[modes_uv]
+                    sigma_uv = sph_harm(ms[modes_uv], ls[modes_uv], PHI[...,_np.newaxis], THETA[...,_np.newaxis])
+                    sigma[...,u,v,lmode] = _np.sum(sigma_uv*((-1.)**ms[modes_uv])*values*_np.sqrt(4*_np.pi), axis=-1)
+    if shtype == 'irr':
+        sigma /= R[...,_np.newaxis,_np.newaxis,_np.newaxis]**(lmodes+2)
     else:
-        size_row_sub = 3*(lmax_sub+1)**2
-        size_col_sub = m_max*(mode_sub+1)**2
-        Csub = _spm.lil_matrix( (size_row_sub, size_col_sub), dtype=_np.complex_ )
+        sigma *= R[...,_np.newaxis,_np.newaxis,_np.newaxis]**(lmodes-1)
+    return sigma.sum(axis=-1).real
 
-        for m_dir in range(m_max):
-            for l in range(mode_sub+1):
-                for m in range(-l, l+1):
-                    if verbose:
-                        print(m_dir, l, m)
-                    for k in range(3):
-                        nk = (lmax_sub+1)**2
-                        NK = (lmax+1)**2
-                        J_full = spec_lmk2J(l, m, m_dir, lmax=mode_lmax)
-                        J_sub = spec_lmk2J(l, m, m_dir, lmax=mode_sub)
-                        Tlm = Cmat[k*NK:k*NK+nk, J_full]
-                        Csub[k*nk:(k+1)*nk, J_sub] = Tlm
-        if not (Csub_file is None):
-            _sp.io.savemat(Csub_file, {'Cmat': Csub})
-    return Csub
-
-def visualize_Cmat(Csub, precision=0, m_max=4):
+def visualize_Cmat(Csub, precision=1e-8, m_max=3):
     _plt.spy(Csub, precision=precision, markersize = 3)
     mode_sub = _np.int(_np.sqrt(Csub.shape[1]/m_max))-1
     lmax_sub = _np.int(_np.sqrt(Csub.shape[0]/3))-1
@@ -127,85 +146,3 @@ def visualize_Cmat(Csub, precision=0, m_max=4):
         _plt.title('Solution A+B', fontsize=24)
     else:
         _plt.title('Solution B', fontsize=24)
-
-def print_SH_mode(vec, m_dir=4, etol=1e-8, verbose=True):
-    # vec is a *complex* spherical harmonic vector
-    # with m different directions
-    idx_type = [('index', '<i4', 3), ('coeff', _np.complex_)]
-    idx_mode = _np.array([], dtype=idx_type)
-    lmax = _np.int(_np.sqrt(vec.size / m_dir)) - 1
-    idx = [spec_J2lmk(i, lmax) for i in range(vec.size)]
-    for i in range(vec.size):
-        if (_np.abs(_np.real(vec[i])) > etol or \
-            _np.abs(_np.imag(vec[i])) > etol):
-            if verbose:
-                print('index:',i, idx[i], 'coeff:', vec[i])
-            new_idx = _np.array((idx[i], vec[i]), dtype=idx_type)
-            idx_mode = _np.append(idx_mode, new_idx)
-    return idx_mode
-
-def stress_solution(index_sol, X, Y, Z, MU=100, NU=0.25, lmax=100, shtype='irr', recalc=False, verbose=True):
-    R = _np.sqrt(X**2+Y**2+Z**2)
-    THETA = _np.arccos(Z/R)
-    PHI = _np.arctan2(Y, X)
-    sigma_tot = _np.zeros(X.shape+(3,3))*(0j)
-    Slm_dir = 'Slm_SH_mu'+str(MU)+'_nu'+str(NU)
-    if verbose:
-        print('the stress solution includes: ')
-        print('l m k coeff')
-    for idx_sol in index_sol:
-        l, m, k = idx_sol['index']
-        c_omega = idx_sol['coeff']
-        if verbose:
-            print(l, m, k, c_omega)
-        sigma = _np.zeros(X.shape+(3,3))*(0j)
-        Slm = _she.S_mode(l, m, k, MU, NU, c_omega=c_omega, shtype=shtype, lmax=lmax, recalc=recalc)
-        for idx in _np.ndindex(X.shape):
-            lat_d = 90-THETA[idx]/_np.pi*180
-            lon_d = PHI[idx]/_np.pi*180
-            for u in range(3):
-                for v in range(3):
-                    Slm_uv = Slm[u][v].to_array()
-                    sigma_uv = _psh.expand.MakeGridPointC(Slm_uv, lat_d, lon_d)
-                    sigma[idx+(u,v)] = sigma_uv
-            if shtype == 'irr':
-                sigma[idx] /= R[idx]**(l+2)
-            else:
-                sigma[idx] *= R[idx]**(l-1)
-        sigma_tot = sigma_tot + sigma # sigma(r,theta,phi)
-    return sigma_tot
-
-def fast_stress_solution(index_sol, X, Y, Z, MU=100, NU=0.25, lmax=100, recalc=False, verbose=True):
-    # do not use
-    R = _np.sqrt(X**2+Y**2+Z**2)
-    THETA = _np.arccos(Z/R)
-    PHI = _np.arctan2(Y, X)
-    sigma_tot = _np.zeros(X.shape+(3,3))*(0j)
-    for u in range(3):
-        for v in range(3):
-            dictidx = index_sol['dict']
-            c_omega = index_sol['coeff']
-    if verbose:
-        print('the stress solution includes: ')
-        print('l m k coeff')
-    for idx_sol in index_sol:
-        l, m, k = idx_sol['index']
-        c_omega = idx_sol['coeff']
-        if verbose:
-            print(l, m, k, c_omega)
-        sigma = _np.zeros(X.shape+(3,3))*(0j)
-        Slm = _she.S_mode(l, m, k, MU, NU, c_omega=c_omega, shtype='irr', lmax=lmax, recalc=recalc)
-        for idx in _np.ndindex(X.shape):
-            lat_d = 90-THETA[idx]/_np.pi*180
-            lon_d = PHI[idx]/_np.pi*180
-            for u in range(3):
-                for v in range(3):
-                    Slm_uv = Slm[u][v].to_array()
-                    sigma_uv = _psh.expand.MakeGridPointC(Slm_uv, lat_d, lon_d)
-                    sigma[idx+(u,v)] = sigma_uv
-            if k == 3:
-                sigma[idx] /= R[idx]**(l+3)
-            else:
-                sigma[idx] /= R[idx]**(l+2)
-        sigma_tot = sigma_tot + sigma # sigma(r,theta,phi)
-    return sigma_tot

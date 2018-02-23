@@ -1,6 +1,8 @@
 import numpy as _np
 import pyshtools as _psh
 import scipy as _sp
+from scipy.special import factorial
+from pyshtools.legendre import PLegendreA
 
 def second_deriv_R( X, Y, Z ):
 # Rij = 
@@ -77,7 +79,7 @@ def third_deriv_R(X, Y, Z):
 
 ######################### Analytical solution from Takahashi & Ghoniem (2008) ################
 
-def Legendre_poly(N, Z, LegendreP,dl,dm, csphase=-1):
+def Legendre_poly(N, Z, LegendreP, dl,dm, csphase=-1):
     nmax = N.max()
     dl = _np.array(dl)
     dm = _np.array(dm)
@@ -91,48 +93,18 @@ def Legendre_poly(N, Z, LegendreP,dl,dm, csphase=-1):
 
     return p
 
-def void_screw_disl(nmax, zs, ts, mu1, mu2, nu1=0.25, nu2=0.25, a=1, b=1):
-    ns = _np.arange(nmax) + 1
-    n, z, t = _np.meshgrid(ns, zs, ts)
-    r = _np.sqrt(z**2 + t**2)
-    z = z/r
-    lambda1 = 2*mu1*nu1/(1-2*nu1)
-    lambda2 = 2*mu2*nu2/(1-2*nu2)
-
-    Kn = -(lambda1+mu1)/2/((n+2)*lambda1+(3*n+5)*mu1)
-    EnI = 1/(2*n+1)*((n-1)*lambda1 - (n+4)*mu1)/((n+2)*lambda1+(3*n+5)*mu1)
-    eta_n = b/4/_np.pi * ((-2)**n) *_sp.misc.factorial(n-1)/_sp.misc.factorial(2*n-1)
-
-    Cab = (mu1-mu2)*eta_n/(mu1*(n+2)+mu2*(n-1))
-    denom_ab = mu1*((n+2) + EnI*(2*n+1)*(n+1)) + mu2*2*n
-    a_t_n = (a/t)**n
-    alpha_n = Cab/denom_ab * (mu1*((n+2) - EnI*(2*n+1)*(n-1))) * a_t_n
-    beta_n = -Cab/denom_ab * (mu1*((n+2) + EnI*(2*n+1)*(n-1)) + 2*mu2*(n-1)) * a_t_n
-
-    Omega_n = 2*eta_n*(mu1-mu2)* a_t_n * (a**(n+1)) / denom_ab
-
-    C_term1 = (-a**(n+1) * (2*mu1*alpha_n + mu1*beta_n) + 6*mu1*Kn*Omega_n*(2*n+1)/(2*n+5)) /r**(n+2)
-    C_term2 = (-a**(n+1)/2 *mu1*beta_n + mu1*Kn*Omega_n*(2*n+3)/(2*n+5)) /r**(n+2)
-    C_term3 = (2*mu1*(a**2/r**2 - 1)*Kn*Omega_n+mu1*Kn*Omega_n*2/(2*n+5)) /r**(n+2)
-    C_term4 = (24*mu1*(a**2/r**2 - 1)*Kn*Omega_n+mu1*Kn*Omega_n*24/(2*n+5)) /r**(n+2)
-
-    # After experiment, the implementation in Takahashi&Ghoniem(2008) is unnormalized Legendre Polynomial
-    p = Legendre_poly(n, z, _psh.legendre.PLegendreA,dl = _np.array([1, 1, 3, 3]),dm = _np.array([-1,1, 1,-1]), csphase=-1)
-    return _np.sum(C_term1*p[:,:,:,0] + C_term2*p[:,:,:,1] + C_term3*p[:,:,:,2] + C_term4*p[:,:,:,3], axis=1)
-
 def gavazza1974(nmax, zs, ts, mu1, mu2, nu1=0.25, nu2=0.25, a=1, b=1):
     # this version gets rid of the round-off errors
-    ns = np.arange(nmax)+1
-    n, z, t = np.meshgrid(ns, zs, ts)
-    r = np.sqrt(z**2 + t**2)
+    ns = _np.arange(nmax)+1
+    n, z, t = _np.meshgrid(ns, zs, ts)
+    r = _np.sqrt(z**2 + t**2)
     ct = z/r
     lambda1 = 2*mu1*nu1/(1-2*nu1)
     lambda2 = 2*mu2*nu2/(1-2*nu2)
 
     Kn = -(lambda1+mu1)/2/((n+2)*lambda1+(3*n+5)*mu1)
     EnI = 1/(2*n+1)*((n-1)*lambda1 - (n+4)*mu1)/((n+2)*lambda1+(3*n+5)*mu1)
-    eta_n = b/2/np.pi * ((-2)**n) *factorial(n)/factorial(2*n)
-    #eta_n = b/2/np.pi * (-1)**(n%2) * np.exp(np.sum(np.log(2/np.arange(n+1, 2*n+1))))
+    eta_n = b/2/_np.pi * ((-2)**n) *factorial(n)/factorial(2*n)
 
     Cab = (mu1-mu2)/(mu1*(n+2)+mu2*(n-1))
     denom_ab = mu1*((n+2) + EnI*(2*n+1)*(n+1)) + mu2*2*n
@@ -143,11 +115,37 @@ def gavazza1974(nmax, zs, ts, mu1, mu2, nu1=0.25, nu2=0.25, a=1, b=1):
     Omega_n = 2*(mu1-mu2)* a_t_n * ((a/r)**(n+1)) / denom_ab
 
     # After experiment, the implementation in Takahashi&Ghoniem(2008) is unnormalized Legendre Polynomial
-    p = Legendre_poly(n, ct, pyshtools.legendre.PLegendreA,dl=[1, 1, 2, 2, 3, 3], dm=[-1, 1, 1, -1, 1, -1], csphase=-1)
+    p = Legendre_poly(n, ct, PLegendreA, dl=[1, 1, 2, 2, 3, 3], dm=[-1, 1, 1, -1, 1, -1], csphase=-1)
     term1 = -(a/r)**(n+1) * (2*alpha_n/r * p[:,:,:,0] + beta_n/2/r * (p[:,:,:,1]+2*p[:,:,:,0]))
     term2 = 2*((a/r)**2-1)*Kn*Omega_n/r * (p[:,:,:,4]+12*p[:,:,:,5])
     term3 = Kn*Omega_n/r * ct * (p[:,:,:,2] + 6*p[:,:,:,3])
     sol = mu1*(term1 + term2 + term3)*eta_n
-    #sol = mu*b*(term2)
-    return np.sum(sol, axis=1)
+    return _np.sum(sol, axis=1)
 
+def willis1972(a, d, nmax, x3, mu=1, b=1):
+    n = _np.arange(nmax)+1
+    r = _np.sqrt(x3**2+d**2)
+    ct= x3/r
+    st= d/r
+    N, X3 = _np.meshgrid(n, x3)
+    eta_n = b/2/_np.pi * ((-2)**N) *factorial(N)/factorial(2*N)
+
+    M = (6-N)/(3*N**2+7*N+6)
+    R = _np.sqrt(X3**2+d**2)
+    CT= X3/R
+    L = 2*(3*N**2+7*N+6)
+    Z = (a/R)**2
+
+    p = Legendre_poly(N, CT, PLegendreA, dl=[1, 1, 2, 2, 3, 3], dm=[-1, 1, 1, -1, 1, -1], csphase=-1)
+
+    prefactor = mu*b/a*(a**2/R/d)**N*Z
+    term1 = (1+(2*N-1)*M)/(N+2)*p[:,:,0]
+    term2 = -(1+M)/2/(N+2)*p[:,:,1]
+    term3 = 3/L*CT*(p[:,:,2]+6*p[:,:,3])
+    term4 = -6/L*(1-Z)*(p[:,:,4]+12*p[:,:,5])
+
+    F1 = prefactor*(term1+term2+term3+term4)*eta_n
+    Fa = 5.0/32/_np.pi*(a/d)**4*(1+3*ct**2)*st**3
+    F = -2*_np.trapz(_np.sum(F1[:, :], axis=1), x=x3)
+    
+    return (F1, Fa, F)

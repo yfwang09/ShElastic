@@ -98,8 +98,6 @@ ENV/
 /site
 
 # mypy
-.mypy_cache/
-.mat
-.png
-test_screw
-*mode
+*.mat
+*.png
+

@@ -27,6 +27,11 @@ This README would normally document whatever steps are necessary to get your app
 
 Then you are good to use the functions provided in this package.
 
+* Generate saved modes
+
+1. Change the desired lmax in `generate_modes.py`
+2. run `python3 generate_modes.py`
+
 * Running test cases interactively
 
 1. Install Jupyter (see jupyter.org)
@@ -36,7 +41,7 @@ Then you are good to use the functions provided in this package.
 
 * running test cases without jupyter
 
-Void-dislocation interaction: `python3 void-dislocation+interaction.py`
+Void-dislocation interaction: `python3 Case02-Void_Dislocation_Interaction.py`
 
 ### Contribution guidelines ###
 

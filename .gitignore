@@ -98,6 +98,7 @@ ENV/
 /site
 
 # mypy
-*.mat
 *.png
+*.eps
+*.asv
 

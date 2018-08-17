@@ -79,12 +79,14 @@ def third_deriv_R(X, Y, Z):
 
 ######################### Analytical solution from Takahashi & Ghoniem (2008) ################
 
-def Legendre_poly(N, Z, LegendreP, dl,dm, csphase=-1):
+def Legendre_poly(N, Z, LegendreP, dl, dm, csphase=-1):
     nmax = N.max()
     dl = _np.array(dl)
     dm = _np.array(dm)
     p = _np.empty(Z.shape+dl.shape)
-    for idx, _ in _np.ndenumerate(N):
+    for idx in _np.ndindex(*Z.shape):
+        #print(N.shape, Z.shape, idx)
+        #print(N[idx], Z[idx])
         n, z = (N[idx], Z[idx])
         Pvalue = LegendreP(nmax+3, z, csphase=csphase)
         l = n + dl; m = n + dm;
@@ -124,28 +126,27 @@ def gavazza1974(nmax, zs, ts, mu1, mu2, nu1=0.25, nu2=0.25, a=1, b=1):
 
 def willis1972(a, d, nmax, x3, mu=1, b=1):
     n = _np.arange(nmax)+1
-    r = _np.sqrt(x3**2+d**2)
-    ct= x3/r
-    st= d/r
-    N, X3 = _np.meshgrid(n, x3)
+    X3, D, N = _np.meshgrid(x3, d, n)#, sparse=True)
     eta_n = b/2/_np.pi * ((-2)**N) *factorial(N)/factorial(2*N)
 
     M = (6-N)/(3*N**2+7*N+6)
-    R = _np.sqrt(X3**2+d**2)
+    fact = factorial(N-1)*factorial(N)/factorial(2*N+1)
+    R = _np.sqrt(X3**2+D**2)
+    ST = D/R
     CT= X3/R
     L = 2*(3*N**2+7*N+6)
     Z = (a/R)**2
-
     p = Legendre_poly(N, CT, PLegendreA, dl=[1, 1, 2, 2, 3, 3], dm=[-1, 1, 1, -1, 1, -1], csphase=-1)
 
-    prefactor = mu*b/a*(a**2/R/d)**N*Z
-    term1 = (1+(2*N-1)*M)/(N+2)*p[:,:,0]
-    term2 = -(1+M)/2/(N+2)*p[:,:,1]
-    term3 = 3/L*CT*(p[:,:,2]+6*p[:,:,3])
-    term4 = -6/L*(1-Z)*(p[:,:,4]+12*p[:,:,5])
+    prefactor = mu*b/a*(a**2/R/D)**N*Z
+    term1 = (1+(2*N-1)*M)/(N+2)*p[...,0]
+    term2 = -(1+M)/2/(N+2)*p[...,1]
+    term3 = 3/L*CT*(p[...,2]+6*p[...,3])
+    term4 = -6/L*(1-Z)*(p[...,4]+12*p[...,5])
 
-    F1 = prefactor*(term1+term2+term3+term4)*eta_n
-    Fa = 5.0/32/_np.pi*(a/d)**4*(1+3*ct**2)*st**3
-    F = -2*_np.trapz(_np.sum(F1[:, :], axis=1), x=x3)
+    F1 = _np.sum(prefactor*(term1+term2+term3+term4)*eta_n, axis=-1)         # exact solution
+    Fa = _np.sum(5.0/32/_np.pi*(a/D)**4*(1+3*CT**2)*ST**3, axis=-1)          # asymptotic solution
+    F = _np.trapz(F1, x=x3)                                                 # total force along the line
+    E = _np.sum(-mu*b**2*a/4/_np.pi*(2*a/D)**(2*N)*fact*(1+(N+1+2*M*N)/(N+2)), axis=-1).mean(axis=-1) # elastic energy
     
-    return (F1, Fa, F)
+    return (F1, Fa, F, E)

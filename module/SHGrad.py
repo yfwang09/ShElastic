@@ -160,3 +160,4 @@ def VSH2(coeffs, norm='4pi', csphase=1):
     lp1_Y = VSH1(coeffs*lp1, norm=norm, csphase=csphase)
 
     return dcoeffs + lp1_Y
+

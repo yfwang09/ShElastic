@@ -20,6 +20,22 @@ def SphCoord_to_CartCoord(R, THETA, PHI):
     X = R * _np.sin(THETA) * _np.cos(PHI)
     Y = R * _np.sin(THETA) * _np.sin(PHI)
     return (X, Y, Z)
+def TransMat(t_mesh=None, p_mesh=None, lJmax=None):
+    if (t_mesh is None) and (p_mesh is None) and (lJmax is not None):
+        latglq, longlq = _psh.expand.GLQGridCoord(lJmax)
+        theta = _np.radians(90-latglq)
+        phi = _np.radians(longlq)
+        p_mesh, t_mesh = _np.meshgrid(phi, theta)
+    Q = _np.zeros(p_mesh.shape+(3,3))
+    Q[...,0,0] = _np.sin(t_mesh)*_np.cos(p_mesh)
+    Q[...,0,1] = _np.sin(t_mesh)*_np.sin(p_mesh)
+    Q[...,0,2] = _np.cos(t_mesh)
+    Q[...,1,0] = _np.cos(t_mesh)*_np.cos(p_mesh)
+    Q[...,1,1] = _np.cos(t_mesh)*_np.sin(p_mesh)
+    Q[...,1,2] =-_np.sin(t_mesh)
+    Q[...,2,0] =-_np.sin(p_mesh)
+    Q[...,2,1] = _np.cos(p_mesh) 
+    return Q
 
 # routines for index transformation
 def lm2L(l, m):
@@ -50,6 +66,10 @@ def l_coeffs(lmax):
     # This function to create the l degrees corresponding to the coefficient matrix shape
     l_list = _np.arange(lmax + 1)
     return _np.broadcast_to(l_list[_np.newaxis,:,_np.newaxis], (2, lmax+1, lmax+1))
+def m_coeffs(lmax):
+    # This function to create the m degrees corresponding to the coefficient matrix shape
+    m_list = _np.arange(lmax + 1)
+    return _np.broadcast_to(m_list[_np.newaxis,_np.newaxis, :], (2, lmax+1, lmax+1))
 
 # routines for matrix shape transformation
 def SHCilmToVector(cilm, lmax=None):
@@ -107,6 +127,55 @@ def dense_mode(mode, d, lmax):
         M = _np.stack(M, axis=-2)
 
     return M
+
+########### visualization
+
+def plotfv(fv, figsize=(10,5), colorbar=True, show=True, vrange=None, cmap='viridis', lonshift=0):
+    """
+    Initialize the class instance from an input array.
+
+    Usage
+    -----
+    fig, ax = SHUtil.plotfv(fv, [figsize, colorbar, show, vrange, cmap, lonshift])
+
+    Returns
+    -------
+    fig, ax : matplotlib figure and axis instances
+
+    Parameters
+    ----------
+    fv : ndarray, shape (nlat, nlon)
+        2-D numpy array of the gridded data, where nlat and nlon are the
+        number of latitudinal and longitudinal bands, respectively.
+    figsize : size of the figure, optional, default = (10, 5)
+    colorbar : bool, optional, default = True
+        If True (default), plot the colorbar along with the map
+    show : bool, optional, default = True
+        If True, plot the image to the screen.
+    vrange : 2-element tuple, optional
+        The range of the colormap, default is (min, max)
+    cmap : string, default = 'viridis'
+        Name of the colormap, see matplotlib
+    lonshift : float, in degree, default = 0
+        Shift the map along longitude direction by lonshift degree
+    """
+    if lonshift is not None:
+        fv = _np.roll(fv, _np.round(fv.shape[1]*lonshift/360).astype(_np.int), axis=1)
+    if vrange is None:
+        fmax, fmin = fv.max(), fv.min()
+    else:
+        fmin, fmax = vrange
+    fcolors = (fv - fmin)/(fmax - fmin)    # normalize the values into range [0, 1]
+    fcolors[fcolors<0]=0
+    fig0 = _plt.figure(figsize=figsize)
+    ax0 = fig0.add_subplot(111)
+    cax0 = ax0.imshow(fv, extent=(0, 360, -90, 90), cmap=cmap, vmin=fmin, vmax=fmax)
+    ax0.set(xlabel='longitude', ylabel='latitude')
+    if colorbar:
+        fig0.colorbar(cax0)
+    if show:
+        _plt.show()
+    return fig0, ax0
 
 ########### savemode, loadmode: save and load vectorized spherical harmonic mode (l, m, value)
 

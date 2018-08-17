@@ -42,6 +42,6 @@ Then you are good to use the functions provided in this package.
 
 ### Who do I talk to? ###
 
-* Wei Cai (caiwei@stanford.edu)
 * Yifan Wang (yfwang09@stanford.edu)
 * Xiaohan Zhang (xzhang11@stanford.edu)
+* Wei Cai (caiwei@stanford.edu)

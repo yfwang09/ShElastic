@@ -75,7 +75,7 @@ def fast_displacement_solution(aK, X, Y, Z, Umodes, lKmax=50, lJmax=53, shtype='
         disp /= R[...,_np.newaxis,_np.newaxis]**(lmodes+1)
     else:
         disp *= R[...,_np.newaxis,_np.newaxis]**(lmodes)
-    return disp.sum(axis=-1).real
+    return disp.sum(axis=-1) # .real
     
 def fast_stress_solution(aK, X, Y, Z, Smodes, lKmax=50, lJmax=53, shtype='irr', verbose=True):
     R, THETA, PHI = CartCoord_to_SphCoord(X, Y, Z)
@@ -107,11 +107,17 @@ def fast_stress_solution(aK, X, Y, Z, Smodes, lKmax=50, lJmax=53, shtype='irr', 
         sigma *= R[...,_np.newaxis,_np.newaxis,_np.newaxis]**(lmodes-1)
     return sigma.sum(axis=-1).real
 
-def fast_energy_solution(A_sol, Dmat, Cmat):
+def fast_energy_solution(A_sol, Dmat, Cmat, Ac_sol=None, Dcmat=None, Ccmat=None):
     Uvec = Dmat.dot(A_sol)
     Tvec = Cmat.dot(A_sol)
+    if (Dcmat is not None) and (Ccmat is not None):
+        Ucvec = Dcmat.dot(Ac_sol)
+        Tcvec = Ccmat.dot(Ac_sol)
+        Ecore = 2*_np.pi*_np.vdot(Ucvec, Tcvec).real
+    else:
+        Ecore = 0
 
-    return 2*_np.pi*_np.multiply(Uvec, Tvec).sum().real
+    return -Ecore + 2*_np.pi*_np.vdot(Uvec, Tvec).real
 
 def visualize_Cmat(Csub, precision=1e-8, m_max=3):
     _plt.spy(Csub, precision=precision, markersize = 3)

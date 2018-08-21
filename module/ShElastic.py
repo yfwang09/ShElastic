@@ -104,20 +104,32 @@ def generate_modes(lmax, etol=1e-8, save_lmax=50):
                 Unu, U0, Snu1, Snu2, Snu3, S0 = genSmode(l, m, k, shtype='irr',returnU=True)
                 Tnu1 = calTmode(Snu1); Tnu2 = calTmode(Snu2); Tnu3 = calTmode(Snu3); T0 = calTmode(S0)
                 print('irregular solid harmonic modes...')
-                U1irr[:, K] = sparse_mode(Unu, lmax=save_lmax); U0irr[:, K] = sparse_mode(U0, lmax=save_lmax);
-                S1irr[:, K] = sparse_mode(Snu1, lmax=save_lmax); S2irr[:, K] = sparse_mode(Snu2, lmax=save_lmax);
-                S3irr[:, K] = sparse_mode(Snu3, lmax=save_lmax); S0irr[:, K] = sparse_mode(S0, lmax=save_lmax);
-                T1irr[:, K] = sparse_mode(Tnu1, lmax=save_lmax); T2irr[:, K] = sparse_mode(Tnu2, lmax=save_lmax);
-                T3irr[:, K] = sparse_mode(Tnu3, lmax=save_lmax); T0irr[:, K] = sparse_mode(T0, lmax=save_lmax);
+                U1irr[:, K] = sparse_mode(Unu, lmax=save_lmax, etol=etol); 
+                U0irr[:, K] = sparse_mode(U0, lmax=save_lmax, etol=etol);
+                S1irr[:, K] = sparse_mode(Snu1, lmax=save_lmax, etol=etol); 
+                S2irr[:, K] = sparse_mode(Snu2, lmax=save_lmax, etol=etol);
+                S3irr[:, K] = sparse_mode(Snu3, lmax=save_lmax, etol=etol); 
+                S0irr[:, K] = sparse_mode(S0, lmax=save_lmax, etol=etol);
+                T1irr[:, K] = sparse_mode(Tnu1, lmax=save_lmax, etol=etol); 
+                T2irr[:, K] = sparse_mode(Tnu2, lmax=save_lmax, etol=etol);
+                T3irr[:, K] = sparse_mode(Tnu3, lmax=save_lmax, etol=etol); 
+                T0irr[:, K] = sparse_mode(T0, lmax=save_lmax, etol=etol);
                 Unu, U0, Snu1, Snu2, Snu3, S0 = genSmode(l, m, k, shtype='reg',returnU=True)
-                Tnu1 = calTmode(Snu1); Tnu2 = calTmode(Snu2); Tnu3 = calTmode(Snu3); T0 = calTmode(S0)
+                Tnu1 = -calTmode(Snu1); Tnu2 = -calTmode(Snu2); Tnu3 = -calTmode(Snu3); T0 = -calTmode(S0)
                 print('regular solid harmonic modes...')
-                U1reg[:, K] = sparse_mode(Unu, lmax=save_lmax); U0reg[:, K] = sparse_mode(U0, lmax=save_lmax);
-                S1reg[:, K] = sparse_mode(Snu1, lmax=save_lmax); S2reg[:, K] = sparse_mode(Snu2, lmax=save_lmax);
-                S3reg[:, K] = sparse_mode(Snu3, lmax=save_lmax); S0reg[:, K] = sparse_mode(S0, lmax=save_lmax);
-                T1reg[:, K] = sparse_mode(Tnu1, lmax=save_lmax); T2reg[:, K] = sparse_mode(Tnu2, lmax=save_lmax);
-                T3reg[:, K] = sparse_mode(Tnu3, lmax=save_lmax); T0reg[:, K] = sparse_mode(T0, lmax=save_lmax);
+                U1reg[:, K] = sparse_mode(Unu, lmax=save_lmax, etol=etol); 
+                U0reg[:, K] = sparse_mode(U0, lmax=save_lmax, etol=etol);
+                S1reg[:, K] = sparse_mode(Snu1, lmax=save_lmax, etol=etol); 
+                S2reg[:, K] = sparse_mode(Snu2, lmax=save_lmax, etol=etol);
+                S3reg[:, K] = sparse_mode(Snu3, lmax=save_lmax, etol=etol); 
+                S0reg[:, K] = sparse_mode(S0, lmax=save_lmax, etol=etol);
+                T1reg[:, K] = sparse_mode(Tnu1, lmax=save_lmax, etol=etol); 
+                T2reg[:, K] = sparse_mode(Tnu2, lmax=save_lmax, etol=etol);
+                T3reg[:, K] = sparse_mode(Tnu3, lmax=save_lmax, etol=etol); 
+                T0reg[:, K] = sparse_mode(T0, lmax=save_lmax, etol=etol);
     savemat('Umodes.mat', {'U1irr': U1irr, 'U1reg': U1reg, 'U0irr': U0irr, 'U0reg': U0reg})
-    savemat('Smodes.mat', {'S1irr': S1irr, 'S1reg': S1reg, 'S2irr': S2irr, 'S2reg': S2reg,'S3irr': S3irr, 'S3reg': S3reg, 'S0irr': S0irr, 'S0reg': S0reg})
-    savemat('Tmodes.mat', {'T1irr': T1irr, 'T1reg': T1reg, 'T2irr': T2irr, 'T2reg': T2reg,'T3irr': T3irr, 'T3reg': T3reg, 'T0irr': T0irr, 'T0reg': T0reg})
+    savemat('Smodes.mat', {'S1irr': S1irr, 'S1reg': S1reg, 'S2irr': S2irr, 'S2reg': S2reg,
+                           'S3irr': S3irr, 'S3reg': S3reg, 'S0irr': S0irr, 'S0reg': S0reg})
+    savemat('Tmodes.mat', {'T1irr': T1irr, 'T1reg': T1reg, 'T2irr': T2irr, 'T2reg': T2reg,
+                           'T3irr': T3irr, 'T3reg': T3reg, 'T0irr': T0irr, 'T0reg': T0reg})
     print('save success')

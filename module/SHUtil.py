@@ -169,7 +169,7 @@ def plotfv(fv, figsize=(10,5), colorbar=True, show=True, vrange=None, cmap='viri
     fcolors[fcolors<0]=0
     fig0 = _plt.figure(figsize=figsize)
     ax0 = fig0.add_subplot(111)
-    cax0 = ax0.imshow(fv, extent=(0, 360, -90, 90), cmap=cmap, vmin=fmin, vmax=fmax)
+    cax0 = ax0.imshow(fv, extent=(0, 360, -90, 90), cmap=cmap, vmin=fmin, vmax=fmax, interpolation='nearest')
     ax0.set(xlabel='longitude', ylabel='latitude')
     if colorbar:
         fig0.colorbar(cax0)

@@ -189,4 +189,139 @@ def SHvec_ctor(xvec):
     rcilm = pyshtools.shio.SHctor(ccilm)
     return pyshtools.shio.SHCilmToVector(rcilm)
 
+# generating neighboring list
+
+def d2v(Xs, Xv, avg_dist=True, vert_weight=1):
+    #### point-to-point distance
+    ## Xs: points for testing (..., 3); 
+    ## Xv: m data points (m, 3);
+    ## avg_dist: if True, calculate the average shape difference per node
+    ## vert_weight: the weighing function for different coordinates (3, )
+    d2vmat = np.linalg.norm((Xs[..., np.newaxis, :]-Xv)*vert_weight, axis=-1)   # pair-wise distances (..., m)
+    if avg_dist:
+        return d2vmat.min(axis=-1).mean()
+    else:
+        return d2vmat
+
+def d2e(Xs, Xe, e_cached=None, avg_dist=True, infval=False, debug=False):
+    #### point-to-edge distance
+    ## Xs: points for testing (..., 3); 
+    ## Xe: m edges from data (m, 2, 3);
+    ## avg_dist: if True, calculate the average shape difference per node
+    ## infval: if True, the projection outside the edge will be consider infinite distance
+    ## debug: output info for debug/testing
+    if e_cached is None:
+        r1 = Xe[..., 0, :]; r2 = Xe[..., 1, :]; r12 = r2 - r1;        # m x 3, edge vertices
+        l12 = np.linalg.norm(r12, axis=-1)                            # m,     edge length
+    else:
+        r1, r12, l12 = e_cached
+    t = np.sum((Xs[..., np.newaxis, :]-r1)*r12, axis=-1)/l12**2   # n x m,     projection ratio
+    t_cal = t.copy(); t_cal[t<0] = 0; t_cal[t>1] = 1;             # a copy of t for calculation
+    q = r1 + (t_cal[...,np.newaxis]*r12)                          # n x m x 3, projection point
+    d2emat = np.linalg.norm(Xs[..., np.newaxis, :] - q, axis=-1)  # n x m
+    if infval:
+        d2emat[np.logical_or(t<0, t>1)] = np.inf
+    if avg_dist:
+        return d2emat.min(axis=-1).mean()
+    else:
+        if debug:
+            dr1 = np.linalg.norm(Xs[..., np.newaxis, :] - r1, axis=-1)
+            dr2 = np.linalg.norm(Xs[..., np.newaxis, :] - r2, axis=-1)
+            return (d2emat, q, dr1, dr2)
+        else:
+            return d2emat
+        
+def generate_fcache(Xf):
+    r0 = Xf[..., 0, :]; r1 = Xf[..., 1, :]; r2 = Xf[..., 2, :];    # m x 3
+    nf = np.cross(r1-r0, r2-r0)                                    # normal vector
+    nf = nf / np.linalg.norm(nf, axis=-1)[...,np.newaxis]          # m x 3
+    r11 = np.sum((r2 - r0)**2, axis=-1)                            # m
+    r00 = np.sum((r1 - r0)**2, axis=-1)                            # m
+    r01 = np.sum((r1-r0)*(r2-r0), axis=-1)                         # m
+    d = r11*r00 - r01*r01                                          # m
+    return r0, r1, r2, nf, r00, r11, r01, d
+
+def d2f(Xs, Xf, f_cached=None, avg_dist=True, infval=False, debug=False, vert_weight=1, fasteval=False):
+    #### point-to-face distance
+    ## Xs: points for testing (..., 3); 
+    ## Xf: m faces from data (m, 3, 3);
+    ## avg_dist: if True, calculate the average shape difference per node
+    ## infval: if True, the projection outside the face will be consider infinite distance
+    ## debug: output info for debug/testing
+    ## vert_weight: the weighing function for different coordinates (3, )
+    ## fasteval: if True, only calculate the point-vertex distances for estimation.
+
+    if fasteval:
+        d2fmat = np.linalg.norm(Xs[...,np.newaxis,np.newaxis,:] - Xf, axis=-1).min(axis=-1)
+    else:
+        if f_cached is None:
+            f_cached = generate_fcache(Xf)
+        r0, r1, r2, nf, r00, r11, r01, d = f_cached
+        pq = np.sum((Xs[...,np.newaxis,:]-r0)*nf*vert_weight, axis=-1)     # n x m
+        q = Xs[...,np.newaxis,:] - pq[...,np.newaxis]*nf               # n x m x 3, projection point
+        d2fmat = np.abs(pq)                                            # n x m
+
+        # determine the barycentric coordinate of q
+        r12  = np.sum((r2-r0)*(q-r0), axis=-1)                         # n x m
+        r02  = np.sum((r1-r0)*(q-r0), axis=-1)                         # n x m
+        bary = np.zeros_like(q)                                        # n x m x 3
+        bary[...,2] = (r00*r12-r01*r02)/d
+        bary[...,1] = (r11*r02-r01*r12)/d
+        bary[...,0] = 1 - bary[...,1] - bary[...,2]
+        out = np.any(bary < 0, axis=-1)                                # n x m
+
+        # determine the closest point on the edges
+        Xfv= np.broadcast_to(Xf, q.shape+(3,))[out]                    # n_out x 3 x 3
+        Xp = np.broadcast_to(Xs[...,np.newaxis,:], q.shape)[out]       # n_out x 3
+        ve = np.roll(Xfv, 1, axis=-2)-Xfv                              # n_out x 3 x 3
+        le = np.linalg.norm(ve, axis=-1)                               # n_out x 3
+        ts = np.sum(ve*(Xp[...,np.newaxis,:]-Xfv), axis=-1)/le**2      # n_out x 3
+        ts[ts > 1] = 1; ts[ts < 0] = 0;
+        qs = Xfv+(ts[...,np.newaxis]*ve)
+        dq = np.linalg.norm(((Xp[...,np.newaxis,:]-qs)*vert_weight), axis=-1)       # n_out x 3
+        d2fmat[out] = np.min(dq, axis=-1)
+        if debug:
+            return (d2fmat, q)
+        else:
+            return d2fmat
+
+    if avg_dist:
+        return d2fmat.min(axis=-1).mean()
+    else:
+        return d2fmat
+    
+def generate_neighbor_list(Xt, Xref=None, Eref=None, Fref=None, Fp=None, n_list=200, filename=None):
+    return_value = []
+    if Xref is not None:
+        d2vmat = d2v(Xt, Xref, avg_dist=False)
+        d2varg = np.argsort(d2vmat)[...,:n_list]
+        Xneigh = Xref[d2varg]
+        return_value.append(Xneigh)
+        if filename is not None:
+            np.savez(filename+'_Xneigh', Xneigh=Xneigh)
+    if Eref is not None:
+        d2emat = d2e(Xt, Eref, avg_dist=False)
+        d2earg = np.argsort(d2emat)[...,:n_list]
+        Eneigh = Eref[d2earg]
+        return_value.append(Eneigh)
+        if filename is not None:
+            np.savez(filename+'_Eneigh', Eneigh=Eneigh)
+    if Fref is not None:
+        if Fref.shape[-3] > 1000:
+            d2fmat = d2f(Xt, Fref, avg_dist=False, fasteval=True)
+            d2farg = np.argsort(d2fmat)[...,:n_list]
+            Fn = Fref[d2farg]
+            d2fmat = d2f(Xt, Fn, avg_dist=False)
+            d2farg = np.argsort(d2fmat)[...,:n_list]
+            d2farg0 =np.broadcast_to(np.arange(d2farg.shape[0])[:,np.newaxis,np.newaxis], d2farg.shape)
+            d2farg1 =np.broadcast_to(np.arange(d2farg.shape[1])[np.newaxis,:,np.newaxis], d2farg.shape)
+            Fneigh = Fn[(d2farg0, d2farg1, d2farg)]
+        else:
+            d2fmat = d2f(Xt, Fn, avg_dist=False)
+            d2farg = np.argsort(d2fmat)[...,:n_list]
+            Fneigh = Fref[d2farg]
+        np.savez(filename+'_Fneigh', Fneigh=Fneigh)
+        return_value.append(Fneigh)
+    return tuple(return_value)
+
 

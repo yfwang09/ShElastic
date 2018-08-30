@@ -295,14 +295,24 @@ def generate_neighbor_list(Xt, Xref=None, Eref=None, Fref=None, Fp=None, n_list=
     if Xref is not None:
         d2vmat = d2v(Xt, Xref, avg_dist=False)
         d2varg = np.argsort(d2vmat)[...,:n_list]
-        Xneigh = Xref[d2varg]
+        if len(Xref.shape) > 2:
+            d2varg0 =np.broadcast_to(np.arange(d2varg.shape[0])[:,np.newaxis,np.newaxis], d2varg.shape)
+            d2varg1 =np.broadcast_to(np.arange(d2varg.shape[1])[np.newaxis,:,np.newaxis], d2varg.shape)
+            Xneigh = Xref[(d2varg0, d2varg1, d2varg)]
+        else:
+            Xneigh = Xref[d2varg]
         return_value.append(Xneigh)
         if filename is not None:
             np.savez(filename+'_Xneigh', Xneigh=Xneigh)
     if Eref is not None:
         d2emat = d2e(Xt, Eref, avg_dist=False)
         d2earg = np.argsort(d2emat)[...,:n_list]
-        Eneigh = Eref[d2earg]
+        if len(Eref.shape) > 3:
+            d2earg0 =np.broadcast_to(np.arange(d2earg.shape[0])[:,np.newaxis,np.newaxis], d2earg.shape)
+            d2earg1 =np.broadcast_to(np.arange(d2earg.shape[1])[np.newaxis,:,np.newaxis], d2earg.shape)
+            Eneigh = Eref[(d2earg0, d2earg1, d2earg)]
+        else:
+            Eneigh = Eref[d2earg]
         return_value.append(Eneigh)
         if filename is not None:
             np.savez(filename+'_Eneigh', Eneigh=Eneigh)
@@ -319,9 +329,12 @@ def generate_neighbor_list(Xt, Xref=None, Eref=None, Fref=None, Fp=None, n_list=
         else:
             d2fmat = d2f(Xt, Fn, avg_dist=False)
             d2farg = np.argsort(d2fmat)[...,:n_list]
-            Fneigh = Fref[d2farg]
+            if len(Fref.shape) > 3:
+                d2farg0 =np.broadcast_to(np.arange(d2farg.shape[0])[:,np.newaxis,np.newaxis], d2farg.shape)
+                d2farg1 =np.broadcast_to(np.arange(d2farg.shape[1])[np.newaxis,:,np.newaxis], d2farg.shape)
+                Fneigh = Fref[(d2farg0, d2farg1, d2farg)]
+            else:
+                Fneigh = Fref[d2farg]
         np.savez(filename+'_Fneigh', Fneigh=Fneigh)
         return_value.append(Fneigh)
     return tuple(return_value)
-
-

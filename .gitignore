@@ -103,5 +103,5 @@ ENV/
 *.asv
 *.npy
 *.npz
-
+module/lmax*modes
 runs

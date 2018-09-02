@@ -289,8 +289,56 @@ def d2f(Xs, Xf, f_cached=None, avg_dist=True, infval=False, debug=False, vert_we
         return d2fmat.min(axis=-1).mean()
     else:
         return d2fmat
-    
-def generate_neighbor_list(Xt, Xref=None, Eref=None, Fref=None, Fp=None, n_list=200, filename=None):
+
+def generate_Xneigh(Xt, Xref, n_list=200, filename=None):
+    d2vmat = d2v(Xt, Xref, avg_dist=False)
+    d2varg = np.argsort(d2vmat)[...,:n_list]
+    if len(Xref.shape) > 2:
+        d2varg0 =np.broadcast_to(np.arange(d2varg.shape[0])[:,np.newaxis,np.newaxis], d2varg.shape)
+        d2varg1 =np.broadcast_to(np.arange(d2varg.shape[1])[np.newaxis,:,np.newaxis], d2varg.shape)
+        Xneigh = Xref[(d2varg0, d2varg1, d2varg)]
+    else:
+        Xneigh = Xref[d2varg]
+    if filename is not None:
+        np.savez(filename+'_Xneigh', Xneigh=Xneigh)
+    return Xneigh
+
+def generate_Eneigh(Xt, Eref, n_list=200, filename=None):
+    d2emat = d2e(Xt, Eref, avg_dist=False)
+    d2earg = np.argsort(d2emat)[...,:n_list]
+    if len(Eref.shape) > 3:
+        d2earg0 =np.broadcast_to(np.arange(d2earg.shape[0])[:,np.newaxis,np.newaxis], d2earg.shape)
+        d2earg1 =np.broadcast_to(np.arange(d2earg.shape[1])[np.newaxis,:,np.newaxis], d2earg.shape)
+        Eneigh = Eref[(d2earg0, d2earg1, d2earg)]
+    else:
+        Eneigh = Eref[d2earg]
+    if filename is not None:
+        np.savez(filename+'_Eneigh', Eneigh=Eneigh)
+    return Eneigh
+
+def generate_Fneigh(Xt, Fref, n_list=200, filename=None):
+    if Fref.shape[-3] > 1000:
+        d2fmat = d2f(Xt, Fref, avg_dist=False, fasteval=True)
+        d2farg = np.argsort(d2fmat)[...,:n_list]
+        Fn = Fref[d2farg]
+        d2fmat = d2f(Xt, Fn, avg_dist=False)
+        d2farg = np.argsort(d2fmat)[...,:n_list]
+        d2farg0 =np.broadcast_to(np.arange(d2farg.shape[0])[:,np.newaxis,np.newaxis], d2farg.shape)
+        d2farg1 =np.broadcast_to(np.arange(d2farg.shape[1])[np.newaxis,:,np.newaxis], d2farg.shape)
+        Fneigh = Fn[(d2farg0, d2farg1, d2farg)]
+    else:
+        d2fmat = d2f(Xt, Fref, avg_dist=False)
+        d2farg = np.argsort(d2fmat)[...,:n_list]
+        if len(Fref.shape) > 3:
+            d2farg0 =np.broadcast_to(np.arange(d2farg.shape[0])[:,np.newaxis,np.newaxis], d2farg.shape)
+            d2farg1 =np.broadcast_to(np.arange(d2farg.shape[1])[np.newaxis,:,np.newaxis], d2farg.shape)
+            Fneigh = Fref[(d2farg0, d2farg1, d2farg)]
+        else:
+            Fneigh = Fref[d2farg]
+    np.savez(filename+'_Fneigh', Fneigh=Fneigh)
+    return Fneigh
+
+def generate_neighbor_list(Xt, Xref=None, Eref=None, Fref=None, n_list=200, filename=None):
     return_value = []
     if Xref is not None:
         d2vmat = d2v(Xt, Xref, avg_dist=False)

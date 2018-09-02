@@ -327,7 +327,7 @@ def generate_neighbor_list(Xt, Xref=None, Eref=None, Fref=None, Fp=None, n_list=
             d2farg1 =np.broadcast_to(np.arange(d2farg.shape[1])[np.newaxis,:,np.newaxis], d2farg.shape)
             Fneigh = Fn[(d2farg0, d2farg1, d2farg)]
         else:
-            d2fmat = d2f(Xt, Fn, avg_dist=False)
+            d2fmat = d2f(Xt, Fref, avg_dist=False)
             d2farg = np.argsort(d2fmat)[...,:n_list]
             if len(Fref.shape) > 3:
                 d2farg0 =np.broadcast_to(np.arange(d2farg.shape[0])[:,np.newaxis,np.newaxis], d2farg.shape)

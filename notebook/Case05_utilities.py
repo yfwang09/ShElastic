@@ -19,6 +19,8 @@ from ShElastic import calSmode, calUmode
 from SHBV import generate_submat, visualize_Cmat, print_SH_mode
 
 from scipy.sparse.linalg import lsqr, spsolve
+from scipy.interpolate import RectBivariateSpline
+from scipy.optimize import minimize
 
 # procedures for transformation between Uvec and Tvec
 def Uvec2Tvec(Uvec, Cmat, Dmat, disp=False):
@@ -188,6 +190,283 @@ def SHvec_ctor(xvec):
     ccilm[1,...] = cilm[0,...].imag
     rcilm = pyshtools.shio.SHctor(ccilm)
     return pyshtools.shio.SHCilmToVector(rcilm)
+
+# coefficients to shape-distance
+
+def coeffs2dr(uvec, f_interp=None, lmax=None, X0=None, Complex=False,
+              lat_weights=1, vert_weight=1, l_weight=None, norm_order=1, debug=False):
+    #### shape difference from SH vectors
+    ## uvec: Input real SH vector (3x(lmax+1)^2)
+    ## f_interp: interpolation function that calculates r(theta,phi)
+    ## lmax, X0: pre-calculated parameters for speed-up. Explained in the code.
+    ## Complex: Default False, uvec is the real SH vector using pyshtools.shio.SHVectorToCilm;
+    ##          otherwise, it will be complex SH vector using SHUtil.SHVectorToCilm;
+    ## lat_weights: weighing function for different densities of nodes on different lattitudes.
+    ## vert_weight: weighing function for different error in different directions
+    ## l_weight: weighing function for coefficients (anti-aliasing)
+    if lmax is None:
+        lmax = np.sqrt(uvec.size/3).astype(np.int) - 1
+    nvec = (lmax+1)**2; 
+    if norm_order == np.inf:
+        nmesh = 1
+    else:
+        nmesh = (lmax+1)*(2*lmax+1)
+    cvec = uvec.reshape(3, nvec)
+    # expand the displacement field onto a mesh
+    umesh= [None for _ in range(3)]
+    for k in range(3):
+        if Complex:
+            cilm = SHVectorToCilm(cvec[k, :])
+        else:
+            cilm = pyshtools.shio.SHVectorToCilm(cvec[k, :])
+        coeffs = pyshtools.SHCoeffs.from_array(cilm)
+        grid = coeffs.expand('GLQ')
+        umesh[k] = grid.to_array().real
+    umesh = np.stack(umesh, axis=-1)
+    # calculate the shape
+    if X0 is None:
+        lon = np.deg2rad(grid.lons())
+        colat = np.deg2rad(90-grid.lats())
+        PHI, THETA = np.meshgrid(lon, colat)
+        R = np.ones_like(PHI)
+        X,Y,Z = SphCoord_to_CartCoord(R, THETA, PHI)
+        X0 = np.stack([X,Y,Z], axis=-1)
+    Xs = X0 + umesh
+    rs, ts, ps = CartCoord_to_SphCoord(Xs[...,0], Xs[...,1], Xs[...,2])
+    lats = 90 - np.rad2deg(ts); lons = np.rad2deg(ps); lons[lons < 0] += 360;
+    rref = f_interp.ev(lats, lons) + 1
+    Xref = np.stack(SphCoord_to_CartCoord(rref, ts, ps), axis=-1)
+    if debug:
+        return Xs - Xref
+
+    norm2 = np.sum(((Xs - Xref)*vert_weight)**2, axis=-1)*(lat_weights**2)
+    return np.linalg.norm(norm2.flatten(), ord=norm_order)/nmesh
+
+def coeffs2dist(uvec, Xt=None, f_cached=None, lmax=None, X0=None, Complex=False, 
+                lat_weights=1, vert_weight=1, l_weight=None, debug=False):
+    #### shape difference from SH vectors
+    ## uvec: Input real SH vector (3x(lmax+1)^2)
+    ## Xt: Input shape data (nv x 3) or (nf x 3 x 3); can be full list or neighbor list
+    ## f_cached: Default None, Xt is the coordinates of vertices; otherwise, Xt is the
+    ##          coordinates of faces, and f_cached provides the pre-calculated values.
+    ## lmax, X0: pre-calculated parameters for speed-up. Explained in the code.
+    ## Complex: Default False, uvec is the real SH vector using pyshtools.shio.SHVectorToCilm;
+    ##          otherwise, it will be complex SH vector using SHUtil.SHVectorToCilm;
+    ## lat_weights: weighing function for different densities of nodes on different lattitudes.
+    ## vert_weight: weighing function for different error in different directions
+    ## l_weight: weighing function for coefficients (anti-aliasing)
+    if lmax is None:
+        lmax = np.sqrt(uvec.size/3).astype(np.int) - 1
+    nvec = (lmax+1)**2
+    cvec = uvec.reshape(3, nvec)
+    # expand the displacement field onto a mesh
+    umesh= [None for _ in range(3)]
+    for k in range(3):
+        if Complex:
+            cilm = SHVectorToCilm(cvec[k, :])
+        else:
+            cilm = pyshtools.shio.SHVectorToCilm(cvec[k, :])
+        coeffs = pyshtools.SHCoeffs.from_array(cilm)
+        grid = coeffs.expand('GLQ')
+        umesh[k] = grid.to_array().real
+    umesh = np.stack(umesh, axis=-1)
+    # calculate the shape
+    if X0 is None:
+        lon = np.deg2rad(grid.lons())
+        colat = np.deg2rad(90-grid.lats())
+        PHI, THETA = np.meshgrid(lon, colat)
+        R = np.ones_like(PHI)
+        X,Y,Z = SphCoord_to_CartCoord(R, THETA, PHI)
+        X0 = np.stack([X,Y,Z], axis=-1)
+    Xs = X0 + umesh
+
+    if f_cached is None:
+        d2surfsum = np.sum(((Xs[..., np.newaxis, :]-Xt))**2*vert_weight, axis=-1)
+        d2surf = d2surfsum.min(axis=-1)
+        if debug:
+            return d2surfsum
+    else:
+        #d2surf = d2f(Xs, Xt, f_cached=f_cached, avg_dist=False, vert_weight=vert_weight).min(axis=-1)
+        r0, r1, r2, nf, r00, r11, r01, d = f_cached; Xf = Xt;
+        pq = np.sum((Xs[...,np.newaxis,:]-r0)*nf, axis=-1)             # n x m
+        q = Xs[...,np.newaxis,:] - pq[...,np.newaxis]*nf               # n x m x 3, projection point
+        d2fmat = np.sum(((Xs[...,np.newaxis,:]-r0)*nf)**2*vert_weight, axis=-1)   # n x m
+
+        # determine the barycentric coordinate of q
+        r12  = np.sum((r2-r0)*(q-r0), axis=-1)                         # n x m
+        r02  = np.sum((r1-r0)*(q-r0), axis=-1)                         # n x m
+        bary = np.zeros_like(q)                                        # n x m x 3
+        bary[...,2] = (r00*r12-r01*r02)/d
+        bary[...,1] = (r11*r02-r01*r12)/d
+        bary[...,0] = 1 - bary[...,1] - bary[...,2]
+        out = np.any(bary < 0, axis=-1)                                # n x m
+
+        # determine the closest point on the edges
+        Xfv= np.broadcast_to(Xf, q.shape+(3,))[out]                    # n_out x 3 x 3
+        Xp = np.broadcast_to(Xs[...,np.newaxis,:], q.shape)[out]       # n_out x 3
+        ve = np.roll(Xfv, 1, axis=-2)-Xfv                              # n_out x 3 x 3
+        le = np.linalg.norm(ve, axis=-1)                               # n_out x 3
+        ts = np.sum(ve*(Xp[...,np.newaxis,:]-Xfv), axis=-1)/le**2      # n_out x 3
+        ts[ts > 1] = 1; ts[ts < 0] = 0;
+        qs = Xfv+(ts[...,np.newaxis]*ve)
+        dq = np.sum(((Xp[...,np.newaxis,:]-qs))**2*vert_weight, axis=-1)       # n_out x 3
+        d2fmat[out] = np.min(dq, axis=-1)
+        d2surf = d2fmat.min(axis=-1)
+        if debug:
+            return d2fmat
+    
+    if l_weight is None:
+        regularization = 0
+    else:
+        regularization = np.linalg.norm(np.tile(l_weight, 3)*uvec)
+    return np.mean(d2surf*lat_weights) + regularization*0.05
+
+# target functions
+def sol2dr(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None,
+           f_interp=None, lmax=None, X0=None,
+           lat_weights=None, vert_weight=1, l_weight=None, norm_order=1, separate=False):
+    if lat_weights is None:
+        lat_weights = np.ones((lmax+1, 2*lmax+1))
+    nvec = (lmax+1)**2
+    if np.nonzero(isTfv)[0].size == 0:
+        Tdist = 0
+    else:
+        Tvec = Cmat.dot(aK)
+        tcvec = Tvec.reshape(3, -1)
+        # expand the displacement and traction field onto a mesh
+        tmesh = np.empty((lmax+1, 2*lmax+1, 3))
+        for k in range(3):
+            tcilm = SHVectorToCilm(tcvec[k, :])
+            tgrid = pyshtools.SHCoeffs.from_array(tcilm).expand('GLQ')
+            tmesh[..., k] = tgrid.to_array().real
+        tvalues = np.sum(tmesh[isTfv, :]**2*vert_weight, axis=-1)
+        Tdist = np.mean(tvalues*lat_weights[isTfv])
+    Uvec = Dmat.dot(aK)    
+    Udist = coeffs2dr(Uvec, f_interp=f_interp, lmax=lmax, X0=X0, Complex=True,
+                      lat_weights=lat_weights, vert_weight=vert_weight, norm_order=norm_order)
+    regularization = np.vdot(aK, aK*l_weight).real
+    if separate:
+        return (Udist, Tdist, regularization)
+    return (Udist + alpha*Tdist + beta*regularization)
+
+# target function
+def sol2dist(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None, 
+             f_cached=None, lmax=None, X0=None, Xt=None,
+             lat_weights=None, vert_weight=1, l_weight=None, separate=False):
+    if lat_weights is None:
+        lat_weights = np.ones((lmax+1, 2*lmax+1))
+    if np.nonzero(isTfv)[0].size == 0:
+        Tdist = 0
+    else:
+        Tvec = Cmat.dot(aK)
+        nvec = (lmax+1)**2
+        tcvec = Tvec.reshape(3, -1)
+        # expand the displacement and traction field onto a mesh
+        tmesh = np.empty((lmax+1, 2*lmax+1, 3))
+        for k in range(3):
+            tcilm = SHVectorToCilm(tcvec[k, :])
+            tgrid = pyshtools.SHCoeffs.from_array(tcilm).expand('GLQ')
+            tmesh[..., k] = tgrid.to_array().real
+        tvalues = np.sum(tmesh[isTfv, :]**2*vert_weight, axis=-1)
+        Tdist = np.mean(tvalues*lat_weights[isTfv])
+    Uvec = Dmat.dot(aK)
+    Udist = coeffs2dist(Uvec, Xt=Xt, f_cached=f_cached, lmax=lmax, X0=X0, Complex=True,
+                        lat_weights=lat_weights, vert_weight=vert_weight)
+    regularization = np.vdot(aK, aK*l_weight).real
+    if separate:
+        return (Udist, Tdist, regularization)
+    return (Udist + alpha*Tdist + beta*regularization)
+
+# output of the target function
+def sol2dist_verbose(Asol, r0=1, mu0=1):
+    mean_dist = np.sqrt(Asol[0])*r0
+    mean_T = np.sqrt(Asol[1])*mu0
+    print('  mean shape difference = %.4fum'%mean_dist)
+    print('  mean |T| in free surface = %.4fPa'%mean_T)
+    print('  regularization = %e'%Asol[2])
+    return (mean_dist, mean_T)
+
+# update the arguments of the target function
+def sol2dist_update(AK_iter, args, file_neigh):
+    print('        recalculate neighbor list')
+    Cmat, Dmat, myalpha, mybeta, f_cached, lJmax, X0, XFneigh, lat_weights, vert_weight, A_weight = args
+    Uvec_iter = Dmat.dot(AK_iter)
+    Xt = X0 + SHVec2mesh(Uvec_iter, lmax=lJmax, SphCoord=False, Complex=True)
+    if f_cached is None: # node-node dist
+        Xn = np.load(file_neigh+'.npz')['Xneigh']
+        XFneigh = generate_Xneigh(Xt, Xn, n_list=n_load, filename='tmp')
+    else:               # node-face dist
+        Fn = np.load(file_neigh+'.npz')['Fneigh']
+        XFneigh = generate_Fneigh(Xt, Fn, n_list=n_load, filename='tmp')
+        f_cached = generate_fcache(XFneigh)
+    return (Cmat, Dmat, myalpha, mybeta, f_cached, lJmax, X0, XFneigh, lat_weights, vert_weight, A_weight)
+
+# minimization algorithm
+
+def minimize_AK(AK_init, target, args, iter_config, verbose=None, verbose_args=(), AKfile='', fvfile='', file_neigh=''):
+    #### optimization iteration wrapper
+    ## AK_init: Initial guess of the AK solution
+    ## target: target function, arguments (AK_init, *args, verbose)
+    ## args: arguments for target function
+    ## iter_config: {'N_period', 'minimizer', 'minimizer_config', 
+    ##               'n_update', 'update'} # settings for periodic updating (e.g. neighbor list)
+    ## verbose: print details
+    ## AKfile, fvfile: save current AK and iteration history.
+    ## f_neigh: neighbor list file
+
+    # print initial settings
+    if os.path.exists(AKfile):
+        AK_iter = np.load(AKfile)
+        print('loading AK from file, target function value: %.4e'%target(AK_iter, *args))
+    else:
+        AK_iter = AK_init.copy()
+        print('initial AK, target function value: %.4e'%target(AK_iter, *args))
+    if verbose is not None:
+        verbose(target(AK_iter, *args, True), *verbose_args)
+
+    if os.path.exists(fvfile):
+        tmp = np.loadtxt(fvfile)
+        funval = tmp.reshape(-1, tmp.shape[-1])[:, 1:]
+    else:
+        funval = None
+    
+    # optimization iterations
+    N_period = iter_config['N_period']
+    minimizer = iter_config['minimizer']
+    minimizer_config = iter_config['minimizer_config']
+    n_update = iter_config['n_update']
+    if n_update > 0:
+        print('update args per %d iterations'%n_update)
+    for i in range(N_period):
+        if n_update > 0:
+            if np.remainder(i, n_update) == np.remainder(N_period-1, n_update):
+                print('      update args...')
+                args = iter_config['update'](AK_iter, args, file_neigh)
+
+        print(' period %d/%d'%(i, N_period))
+        tic = time.time()
+        AK_min = minimize(target, AK_iter, args=args,
+                          method=minimizer, options=minimizer_config)
+        toc = time.time()
+        print('  period %d: F = %.4e, time: %.4fs'%(i, AK_min.fun, toc-tic))
+        
+        fparts = target(AK_min.x, *args, True)
+        if verbose is not None:
+            fverb = verbose(fparts, *verbose_args)
+            fvalue = [AK_min.fun, *fverb, *fparts]
+        else:
+            fvalue = [AK_min.fun, *fparts]
+        if funval is None:
+            funval = np.array(fvalue).reshape(1, -1)
+        else:
+            funval = np.vstack([funval, fvalue])
+        AK_iter = AK_min.x
+        if not (AKfile == ''):
+            np.save(AKfile, AK_min.x)
+        if not (fvfile == ''):
+            fvfmt = '%8d'+(' %e'*(funval.shape[1]))
+            np.savetxt(fvfile, np.hstack([np.arange(funval.shape[0])[:, np.newaxis], funval]), fmt=fvfmt)
+    return AK_min.x, funval
 
 # generating neighboring list
 

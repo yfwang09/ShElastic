@@ -339,8 +339,12 @@ def sol2dr(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None,
             tcilm = SHVectorToCilm(tcvec[k, :])
             tgrid = pyshtools.SHCoeffs.from_array(tcilm).expand('GLQ')
             tmesh[..., k] = tgrid.to_array().real
-        tvalues = np.sum(tmesh[isTfv, :]**2*vert_weight, axis=-1)
-        Tdist = np.mean(tvalues*lat_weights[isTfv])
+        if isTfv.dtype == np.bool:
+            tvalues = np.sum((tmesh[isTfv, :]*vert_weight)**2, axis=-1)
+            Tdist = np.mean(tvalues*lat_weights[isTfv]**2)
+        else:
+            tvalues = np.sum((tmesh * vert_weight)**2, axis=-1)*isTfv
+            Tdist = np.mean(tvalues*lat_weights**2)
     Uvec = Dmat.dot(aK)    
     Udist = coeffs2dr(Uvec, f_interp=f_interp, lmax=lmax, X0=X0, Complex=True,
                       lat_weights=lat_weights, vert_weight=vert_weight, norm_order=norm_order)
@@ -367,8 +371,12 @@ def sol2dist(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None,
             tcilm = SHVectorToCilm(tcvec[k, :])
             tgrid = pyshtools.SHCoeffs.from_array(tcilm).expand('GLQ')
             tmesh[..., k] = tgrid.to_array().real
-        tvalues = np.sum(tmesh[isTfv, :]**2*vert_weight, axis=-1)
-        Tdist = np.mean(tvalues*lat_weights[isTfv])
+        if isTfv.dtype == np.bool:
+            tvalues = np.sum((tmesh[isTfv, :]*vert_weight)**2, axis=-1)
+            Tdist = np.mean(tvalues*lat_weights[isTfv]**2)
+        else:
+            tvalues = np.sum((tmesh * vert_weight)**2, axis=-1)*isTfv
+            Tdist = np.mean(tvalues*lat_weights**2)
     Uvec = Dmat.dot(aK)
     Udist = coeffs2dist(Uvec, Xt=Xt, f_cached=f_cached, lmax=lmax, X0=X0, Complex=True,
                         lat_weights=lat_weights, vert_weight=vert_weight)

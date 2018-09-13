@@ -349,7 +349,9 @@ def sol2dr(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None,
     Uvec = Dmat.dot(aK)    
     Udist = coeffs2dr(Uvec, f_interp=f_interp, lmax=lmax, X0=X0, Complex=True,
                       lat_weights=lat_weights, vert_weight=vert_weight, norm_order=norm_order)
-    regularization = np.vdot(Uvec, Uvec*l_weight).real + alpha*np.vdot(Tvec, Tvec*l_weight).real #np.vdot(aK, aK*l_weight).real
+    regularization = np.vdot(Uvec, Tvec).real*2*np.pi
+    #regularization = np.vdot(Uvec, Uvec*l_weight).real + alpha*np.vdot(Tvec, Tvec*l_weight).real 
+    #regularization = np.vdot(aK, aK*l_weight).real
     if separate:
         return (Udist, Tdist, regularization)
     return (Udist + alpha*Tdist + beta*regularization)
@@ -392,7 +394,7 @@ def sol2dist_verbose(Asol, r0=1, mu0=1):
     mean_T = np.sqrt(Asol[1])*mu0
     print('  mean shape difference = %.4fum'%mean_dist)
     print('  mean |T| in free surface = %.4fPa'%mean_T)
-    print('  regularization = %e'%Asol[2])
+    print('  regularization = %epJ'%(Asol[2]*(r0/1e6)**3*mu0*1e12))
     return (mean_dist, mean_T)
 
 # update the arguments of the target function

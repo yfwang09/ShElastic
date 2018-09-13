@@ -207,7 +207,7 @@ def coeffs2dr(uvec, f_interp=None, lmax=None, X0=None, Complex=False,
     if lmax is None:
         lmax = np.sqrt(uvec.size/3).astype(np.int) - 1
     nvec = (lmax+1)**2; 
-    if norm_order == np.inf:
+    if norm_order > 1: #== np.inf:
         nmesh = 1
     else:
         nmesh = (lmax+1)*(2*lmax+1)
@@ -330,6 +330,7 @@ def sol2dr(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None,
     nvec = (lmax+1)**2
     if np.nonzero(isTfv)[0].size == 0:
         Tdist = 0
+        Tvec = 0
     else:
         Tvec = Cmat.dot(aK)
         tcvec = Tvec.reshape(3, -1)
@@ -348,7 +349,7 @@ def sol2dr(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None,
     Uvec = Dmat.dot(aK)    
     Udist = coeffs2dr(Uvec, f_interp=f_interp, lmax=lmax, X0=X0, Complex=True,
                       lat_weights=lat_weights, vert_weight=vert_weight, norm_order=norm_order)
-    regularization = np.vdot(aK, aK*l_weight).real
+    regularization = np.vdot(Uvec, Uvec*l_weight).real + alpha*np.vdot(Tvec, Tvec*l_weight).real #np.vdot(aK, aK*l_weight).real
     if separate:
         return (Udist, Tdist, regularization)
     return (Udist + alpha*Tdist + beta*regularization)

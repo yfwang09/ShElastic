@@ -322,6 +322,7 @@ def coeffs2dist(uvec, Xt=None, f_cached=None, lmax=None, X0=None, Complex=False,
     return np.mean(d2surf*lat_weights) + regularization*0.05
 
 # target functions
+
 def sol2dr(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None,
            f_interp=None, lmax=None, X0=None,
            lat_weights=None, vert_weight=1, l_weight=None, norm_order=1, separate=False):
@@ -425,13 +426,14 @@ def minimize_AK(AK_init, target, args, iter_config, verbose=None, verbose_args=(
     ## AKfile, fvfile: save current AK and iteration history.
     ## f_neigh: neighbor list file
 
+    magnify = 1e4
     # print initial settings
     if os.path.exists(AKfile):
         AK_iter = np.load(AKfile)
-        print('loading AK from file, target function value: %.4e'%target(AK_iter, *args))
+        print('loading AK from file, target function value: %.4e'%(target(AK_iter, *args)))
     else:
         AK_iter = AK_init.copy()
-        print('initial AK, target function value: %.4e'%target(AK_iter, *args))
+        print('initial AK, target function value: %.4e'%(target(AK_iter, *args)))
     if verbose is not None:
         verbose(target(AK_iter, *args, True), *verbose_args)
 
@@ -456,17 +458,18 @@ def minimize_AK(AK_init, target, args, iter_config, verbose=None, verbose_args=(
 
         print(' period %d/%d'%(i, N_period))
         tic = time.time()
-        AK_min = minimize(target, AK_iter, args=args,
+        magnified_target = lambda AK : target(AK, *args)*magnify
+        AK_min = minimize(magnified_target, AK_iter, #args=args,
                           method=minimizer, options=minimizer_config)
         toc = time.time()
-        print('  period %d: F = %.4e, time: %.4fs'%(i, AK_min.fun, toc-tic))
+        print('  period %d: F = %.4e, time: %.4fs'%(i, AK_min.fun/magnify, toc-tic))
         
         fparts = target(AK_min.x, *args, True)
         if verbose is not None:
             fverb = verbose(fparts, *verbose_args)
-            fvalue = [AK_min.fun, *fverb, *fparts]
+            fvalue = [AK_min.fun/magnify, *fverb, *fparts]
         else:
-            fvalue = [AK_min.fun, *fparts]
+            fvalue = [AK_min.fun/magnify, *fparts]
         if funval is None:
             funval = np.array(fvalue).reshape(1, -1)
         else:

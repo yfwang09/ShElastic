@@ -102,3 +102,4 @@ ENV/
 *.mat
 fv_*.txt
 AK_*.npy
+fv_prev/

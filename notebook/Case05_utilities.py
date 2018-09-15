@@ -329,11 +329,10 @@ def sol2dr(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None,
     if lat_weights is None:
         lat_weights = np.ones((lmax+1, 2*lmax+1))
     nvec = (lmax+1)**2
+    Tvec = Cmat.dot(aK)
     if np.nonzero(isTfv)[0].size == 0:
         Tdist = 0
-        Tvec = 0
     else:
-        Tvec = Cmat.dot(aK)
         tcvec = Tvec.reshape(3, -1)
         # expand the displacement and traction field onto a mesh
         tmesh = np.empty((lmax+1, 2*lmax+1, 3))

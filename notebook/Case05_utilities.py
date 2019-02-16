@@ -47,7 +47,7 @@ def Tvec2Uvec(Tvec, Cmat, Dmat, disp=False):
         disp_index_sol = print_SH_mode(A_sol, m_dir=3, etol=1e-8)
     return Dmat.dot(A_sol)
 
-def SHVec2mesh(xvec, lmax=None, SphCoord=True, Complex=False):
+def SHVec2mesh(xvec, lat=None, lon=None, lmax=None, SphCoord=True, Complex=False):
     if lmax is None:
         lmax = (np.sqrt(xvec.size/3) - 1).astype(np.int)
     cvec = xvec.reshape(3, -1)
@@ -63,11 +63,17 @@ def SHVec2mesh(xvec, lmax=None, SphCoord=True, Complex=False):
             cext[:nvec] = cvec[k, :(lmax+1)**2]
             cilm = pyshtools.shio.SHVectorToCilm(cext)
         coeffs = pyshtools.SHCoeffs.from_array(cilm)
-        grid = coeffs.expand('GLQ')
+        if (lat is None) and (lon is None):
+            grid = coeffs.expand('GLQ')
+        else:
+            grid = coeffs.expand(lon=lon, lat=lat)
         xmesh[k] = grid.to_array().real
     xmesh = np.stack(xmesh, axis=-1)
     if SphCoord:
-        Q = TransMat(lJmax=lmax)
+        if (lat is None) and (lon is None):
+            Q = TransMat(lJmax=lmax)
+        else:
+            Q = TransMat(tmesh=90-lat, pmesh=lon)
         xmesh = np.sum(Q*xmesh[...,np.newaxis,:], axis=-1)
     return xmesh
 
@@ -329,10 +335,11 @@ def sol2dr(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None,
     if lat_weights is None:
         lat_weights = np.ones((lmax+1, 2*lmax+1))
     nvec = (lmax+1)**2
-    Tvec = Cmat.dot(aK)
     if np.nonzero(isTfv)[0].size == 0:
         Tdist = 0
+        Tvec = 0
     else:
+        Tvec = Cmat.dot(aK)
         tcvec = Tvec.reshape(3, -1)
         # expand the displacement and traction field onto a mesh
         tmesh = np.empty((lmax+1, 2*lmax+1, 3))
@@ -349,8 +356,8 @@ def sol2dr(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None,
     Uvec = Dmat.dot(aK)    
     Udist = coeffs2dr(Uvec, f_interp=f_interp, lmax=lmax, X0=X0, Complex=True,
                       lat_weights=lat_weights, vert_weight=vert_weight, norm_order=norm_order)
-    regularization = np.vdot(Uvec, Tvec).real*2*np.pi
-    #regularization = np.vdot(Uvec, Uvec*l_weight).real + alpha*np.vdot(Tvec, Tvec*l_weight).real
+    #regularization = np.vdot(Uvec, Tvec).real*2*np.pi
+    regularization = np.vdot(Uvec, Uvec*l_weight).real + alpha*np.vdot(Tvec, Tvec*l_weight).real
     #regularization = np.vdot(aK, aK*l_weight).real
     if separate:
         E = np.vdot(Uvec, Tvec).real*2*np.pi
@@ -393,12 +400,11 @@ def sol2dist(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None,
 def sol2dist_verbose(Asol, r0=1, mu0=1):
     mean_dist = np.sqrt(Asol[0])*r0
     mean_T = np.sqrt(Asol[1])*mu0
-    Eel = Asol[3]*(r0/1e6)**3*mu0*1e12
     print('  mean shape difference = %.4fum'%mean_dist)
     print('  mean |T| in free surface = %.4fPa'%mean_T)
     print('  regularization = %e'%Asol[2])
-    print('  Energy = %epJ'%(Eel))
-    return (mean_dist, mean_T, Eel)
+    print('  Energy = %epJ'%(Asol[3]*(r0/1e6)**3*mu0*1e12))
+    return (mean_dist, mean_T)
 
 # update the arguments of the target function
 def sol2dist_update(AK_iter, args, file_neigh):

@@ -65,15 +65,16 @@ def SHVec2mesh(xvec, lat=None, lon=None, lmax=None, SphCoord=True, Complex=False
         coeffs = pyshtools.SHCoeffs.from_array(cilm)
         if (lat is None) and (lon is None):
             grid = coeffs.expand('GLQ')
+            xmesh[k] = grid.to_array().real
         else:
             grid = coeffs.expand(lon=lon, lat=lat)
-        xmesh[k] = grid.to_array().real
+            xmesh[k] = grid.real
     xmesh = np.stack(xmesh, axis=-1)
     if SphCoord:
         if (lat is None) and (lon is None):
             Q = TransMat(lJmax=lmax)
         else:
-            Q = TransMat(tmesh=90-lat, pmesh=lon)
+            Q = TransMat(t_mesh=90-lat, p_mesh=lon)
         xmesh = np.sum(Q*xmesh[...,np.newaxis,:], axis=-1)
     return xmesh
 

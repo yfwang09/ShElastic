@@ -25,7 +25,6 @@ def genUmode(l, m, k, shtype='irr', lmax=None):
 
     Parameters
     ----------
-
     l,m,k : int
         indices of the basis, l=0,1,2,...; m=-l,-l+1,...,l-1,l; k=0,1,2.
     shtype : str, ['irr' or 'reg']
@@ -89,8 +88,8 @@ def calUmode(Umode, mu, nu, c_omega=1.0):
     C_nu = -4*(1-nu)
     return c_omega*(U_nu * C_nu + U_0)/2.0/mu
 
-def genGradU(U, shtype='irr'):
-    '''generate displacement gradient tensor of a spherical-harmonic displacement vector
+'''def genGradU(l, m, k, shtype='irr', lmax=None, returnU=False):
+    generate displacement gradient tensor of a spherical-harmonic displacement vector
     
     Calculate the displacement gradient tensor grad(U) given a spherical 
     harmonic vector representation of displacement U. This function 
@@ -99,11 +98,15 @@ def genGradU(U, shtype='irr'):
     
     Parameters
     ----------
-    U : complex, dimension (2, lmax + 1, lmax + 1, 3)
-        Spherical harmonic representation of the displacement vector
+    l,m,k : int
+        indices of the basis, l=0,1,2,...; m=-l,-l+1,...,l-1,l; k=0,1,2.
     shtype : str, ['irr' or 'reg']
         'irr' represents irregular spherical harmonics for spherical void
         'reg' represents regular spherical harmonics for solid sphere
+    lmax : int, l+3 by default
+        maximum l order to save the spherical harmonic coefficients.
+    returnU : bool
+        If True, the displacement basis will also be returned.
 
     Returns
     -------
@@ -115,20 +118,18 @@ def genGradU(U, shtype='irr'):
     See (A.16) in the paper for the equation and derivation of the stress
     solution
 
-    '''
-    if shtype == 'irr':
-        c1 = -(l+1)
-    elif shtype == 'reg':
-        c1 = l
-    else: # if (shtype != 'irr') and (shtype != 'reg'):
-        print('genGradU: invalid shtype (irr, reg)')
-        return 0
-    c2 = 1.0
-    gradu = [None for _ in range(3)]
-    for i in range(3):
-        gradu[i] = c1 * VSH1(U[...,i]) + c2 * VSH2(U[...,i])
-    return _np.stack(gradu, axis=-1)
 
+    if lmax is None:
+        lmax = l + 3
+    Umodes = genUmode(l, m, k, shtype=shtype, lmax=lmax)
+    gradUmodes = []
+    for U in Umodes:
+        gradu = [None for _ in range(3)]
+        for i in range(3):
+            gradu[i] = c1 * VSH1(U[...,i]) + c2 * VSH2(U[...,i])
+        gradUmodes.append(_np.stack(gradu, axis=-1))
+'''
+    
 def genSmode(l, m, k, shtype='irr', lmax=None, returnU=False):
     '''generate stress mode (K) = (l,m,k)
     
@@ -167,11 +168,26 @@ def genSmode(l, m, k, shtype='irr', lmax=None, returnU=False):
     solution
 
     '''
+    if shtype == 'irr':
+        c1 = -(l+1)
+    elif shtype == 'reg':
+        c1 = l
+    else: # if (shtype != 'irr') and (shtype != 'reg'):
+        print('genGradU: invalid shtype (irr, reg)')
+        return 0
+    c2 = 1.0
     if lmax is None:
         lmax = l + 3
-    U_nu, U_0 = genUmode(l, m, k, shtype=shtype, lmax=lmax)
-    gradU_nu = genGradU(U_nu, shtype)
-    gradU_0 = genGradU(U_0, shtype)
+
+    Umodes = genUmode(l, m, k, shtype=shtype, lmax=lmax)
+    gradUmodes = []
+    for U in Umodes:
+        gradu = [None for _ in range(3)]
+        for i in range(3):
+            gradu[i] = c1 * VSH1(U[...,i]) + c2 * VSH2(U[...,i])
+        gradUmodes.append(_np.stack(gradu, axis=-1))
+    gradU_nu, gradU_0 = tuple(gradUmodes)
+
     ukk_nu = _np.trace(gradU_nu, axis1=-1, axis2=-2)
     ukk_0 = _np.trace(gradU_0, axis1=-1, axis2=-2)
     S_nu1 = ukk_nu[...,_np.newaxis,_np.newaxis]*_np.eye(3)
@@ -179,6 +195,7 @@ def genSmode(l, m, k, shtype='irr', lmax=None, returnU=False):
     S_nu3 = ukk_0[...,_np.newaxis,_np.newaxis] *_np.eye(3)
     S_0 = 0.5*(gradU_0+_np.swapaxes(gradU_0, -1, -2))
     if returnU:
+        U_nu, U_0 = Umodes
         return (U_nu, U_0, S_nu1, S_nu2, S_nu3, S_0)
     else:
         return (S_nu1, S_nu2, S_nu3, S_0)

@@ -244,7 +244,7 @@ def calTmode(S_K):
         T_K[...,i] = VSH1(S_K[...,i,0])[...,0]+VSH1(S_K[...,i,1])[...,1]+VSH1(S_K[...,i,2])[...,2]
     return T_K
 
-def generate_modes(lmax, etol=1e-8, save_lmax=None, path='.'):
+def generate_modes(lmax, etol=1e-8, save_lmax=None, path=None):
     '''procedure for generating spherical harmonic modes in sparse matrix format
 
     The procedure saves .mat file that includes all the elasticity bases with 
@@ -282,6 +282,7 @@ def generate_modes(lmax, etol=1e-8, save_lmax=None, path='.'):
         path for saving the modes
 
     '''
+    # Todo: append modes given lmax and existing mode
     if save_lmax is None:
         save_lmax = lmax + 3
     M = 3*(save_lmax+1)**2
@@ -327,9 +328,15 @@ def generate_modes(lmax, etol=1e-8, save_lmax=None, path='.'):
                 T2reg[:, K] = sparse_mode(Tnu2, lmax=save_lmax, etol=etol);
                 T3reg[:, K] = sparse_mode(Tnu3, lmax=save_lmax, etol=etol); 
                 T0reg[:, K] = sparse_mode(T0, lmax=save_lmax, etol=etol);
-    savemat(os.path.join(path, 'Umodes.mat'), {'U1irr': U1irr, 'U1reg': U1reg, 'U0irr': U0irr, 'U0reg': U0reg})
-    savemat(os.path.join(path, 'Smodes.mat'), {'S1irr': S1irr, 'S1reg': S1reg, 'S2irr': S2irr, 'S2reg': S2reg,
-                           'S3irr': S3irr, 'S3reg': S3reg, 'S0irr': S0irr, 'S0reg': S0reg})
-    savemat(os.path.join(path, 'Tmodes.mat'), {'T1irr': T1irr, 'T1reg': T1reg, 'T2irr': T2irr, 'T2reg': T2reg,
-                           'T3irr': T3irr, 'T3reg': T3reg, 'T0irr': T0irr, 'T0reg': T0reg})
-    print('save success')
+    Umodes = {'U1irr': U1irr, 'U1reg': U1reg, 'U0irr': U0irr, 'U0reg': U0reg}
+    Smodes = {'S1irr': S1irr, 'S1reg': S1reg, 'S2irr': S2irr, 'S2reg': S2reg,
+              'S3irr': S3irr, 'S3reg': S3reg, 'S0irr': S0irr, 'S0reg': S0reg}
+    Tmodes = {'T1irr': T1irr, 'T1reg': T1reg, 'T2irr': T2irr, 'T2reg': T2reg,
+              'T3irr': T3irr, 'T3reg': T3reg, 'T0irr': T0irr, 'T0reg': T0reg}
+    if path is None:
+        return Umodes, Smodes, Tmodes
+    else:
+        savemat(os.path.join(path, 'Umodes.mat'), Umodes)
+        savemat(os.path.join(path, 'Smodes.mat'), Smodes)
+        savemat(os.path.join(path, 'Tmodes.mat'), Tmodes)
+        print('save success')

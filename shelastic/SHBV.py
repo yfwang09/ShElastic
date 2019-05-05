@@ -1,28 +1,70 @@
 import numpy as _np
-import scipy as _sp
 import scipy.sparse as _spm
 from scipy.special import sph_harm
 import matplotlib.pyplot as _plt
-from scipy.interpolate import SmoothSphereBivariateSpline
-from SHUtil import SHCilmToVector, CartCoord_to_SphCoord, K2lmk
+from shelastic.shelastic import calUmode, calSmode
+from shelastic.shutil import SHCilmToVector, CartCoord_to_SphCoord, K2lmk
 from time import time
 
-def generate_submat(mu, nu, fullmat, lKmax, lJmax,\
-                    lKfull = None, lJfull = None, kK=3, kJ=3, verbose=False):
-    if lKfull is None:
-        M, N = fullmat.shape
-        lKfull = _np.sqrt(N/kK).astype(_np.int)-1;
-        lJfull = _np.sqrt(M/kJ).astype(_np.int)-1;
+def generate_submat(modes, mu, nu, lmax_col, lmax_row, shtype='irr', verbose=False):
+    '''Obtain the sub-matrix of spherical harmonic modes
+    
+    Parameters
+    ----------
+    modes : dict
+        one of Umodes, Smodes, or Tmodes created by generate_modes
+    mu,nu : float
+        shear modulus and Poisson's ratio
+    lmax_col,lmax_row : int
+        lmax for column number (K), and row number (J)
+    shtype : string, ['irr' or 'reg']
+        'irr' represents irregular spherical harmonics for spherical void
+        'reg' represents regular spherical harmonics for solid sphere
+    verbose: bool
+        if True, print sub-matrix size
+    
+    Returns
+    -------
+    complex lil_matrix, dimension (kJ*(lmax_row+1)^2, kK*(lmax_col+1)^2)
+        sub-matrix of spherical harmonic mode. kK = 3 for 3 directions (i,j,k)
+        kJ = 3 for vector (U and T), 9 for tensor (S)
+
+    See Also
+    --------
+    generate_modes : generate spherical harmonic modes
+
+    '''
+    if 'U0'+shtype in modes.keys():   # obtain displacement mode full matrix
+        U1 = modes['U1'+shtype]; U0 = modes['U0'+shtype];
+        fullmat = calUmode((U1, U0), mu, nu)
+        kK, kJ = 3, 3
+    elif 'S0'+shtype in modes.keys(): # obtain stress mode full matrix
+        S1 = modes['S1'+shtype]; S2 = modes['S2'+shtype];
+        S3 = modes['S3'+shtype]; S0 = modes['S0'+shtype];
+        fullmat = calSmode((S1, S2, S3, S0), mu, nu)
+        kK, kJ = 3, 9
+    elif 'T0'+shtype in modes.keys(): # obtain traction mode full matrix
+        T1 = modes['T1'+shtype]; T2 = modes['T2'+shtype];
+        T3 = modes['T3'+shtype]; T0 = modes['T0'+shtype];
+        fullmat = calSmode((T1, T2, T3, T0), mu, nu)
+        kK, kJ = 3, 3
+    else:
+        print('input is not SH mode created by generate_modes()')
+        return -1
+
+    M, N = fullmat.shape
+    lKfull = _np.sqrt(N/kK).astype(_np.int)-1;
+    lJfull = _np.sqrt(M/kJ).astype(_np.int)-1;
 
     LJfull = (lJfull+1)**2; LKfull = (lKfull+1)**2;
-    LJmax = (lJmax+1)**2;   LKmax = (lKmax+1)**2;
+    LJmax = (lmax_row+1)**2;LKmax = (lmax_col+1)**2;
     full_row = kJ*LJfull;   full_col = kK*LKfull;
     size_row = kJ*LJmax;    size_col = kK*LKmax;
     if verbose:
         print('Integrating modes to a matrix')
         print(size_row, size_col)
-    #fullmat =_spm.lil_matrix(fullmat)
-    #submat = _spm.lil_matrix( (size_row, size_col), dtype=fullmat.dtype)
+
+    # Combine sparse matrix using block matrices
     mat_blocks = [[None for _ in range(kK)] for _ in range(kJ)]
     for kj in range(kJ):
         for kk in range(kK):
@@ -30,6 +72,7 @@ def generate_submat(mu, nu, fullmat, lKmax, lJmax,\
             R1 = kj*LJfull;R2 = R1+LJmax; C1 = kk*LKfull;C2 = C1+LKmax;
             mat_blocks[kj][kk] = fullmat[R1:R2, C1:C2]
     submat = _spm.bmat(mat_blocks)
+
     return submat
 
 def print_SH_mode(vec, m_dir=3, etol=1e-8, verbose=True):
@@ -75,8 +118,8 @@ def fast_displacement_solution(aK, X, Y, Z, Umodes, lKmax=50, lJmax=53, shtype='
         disp /= R[...,_np.newaxis,_np.newaxis]**(lmodes+1)
     else:
         disp *= R[...,_np.newaxis,_np.newaxis]**(lmodes)
-    return disp.sum(axis=-1) # .real
-    
+    return disp.sum(axis=-1)
+
 def fast_stress_solution(aK, X, Y, Z, Smodes, lKmax=50, lJmax=53, shtype='irr', verbose=True):
     R, THETA, PHI = CartCoord_to_SphCoord(X, Y, Z)
     sigma = _np.zeros(X.shape+(3,3,lKmax+1), dtype=_np.complex)

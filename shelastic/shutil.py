@@ -382,3 +382,52 @@ def eval_GridC(coeff, latin, lonin, rin=1.0, lmax_calc=None, norm=None, shtype=N
                                                 lmax=lmax_calc, norm=norm, 
                                                 csphase=coeff.csphase)
     return values
+
+########### visualization
+
+def plotfv(fv, figsize=(10,5), colorbar=True, show=True, vrange=None, cmap='viridis', lonshift=0):
+    """
+    Initialize the class instance from an input array.
+
+    Usage
+    -----
+    fig, ax = SHUtil.plotfv(fv, [figsize, colorbar, show, vrange, cmap, lonshift])
+
+    Returns
+    -------
+    fig, ax : matplotlib figure and axis instances
+
+    Parameters
+    ----------
+    fv : ndarray, shape (nlat, nlon)
+        2-D numpy array of the gridded data, where nlat and nlon are the
+        number of latitudinal and longitudinal bands, respectively.
+    figsize : size of the figure, optional, default = (10, 5)
+    colorbar : bool, optional, default = True
+        If True (default), plot the colorbar along with the map
+    show : bool, optional, default = True
+        If True, plot the image to the screen.
+    vrange : 2-element tuple, optional
+        The range of the colormap, default is (min, max)
+    cmap : string, default = 'viridis'
+        Name of the colormap, see matplotlib
+    lonshift : float, in degree, default = 0
+        Shift the map along longitude direction by lonshift degree
+    """
+    if lonshift is not None:
+        fv = _np.roll(fv, _np.round(fv.shape[1]*lonshift/360).astype(_np.int), axis=1)
+    if vrange is None:
+        fmax, fmin = fv.max(), fv.min()
+    else:
+        fmin, fmax = vrange
+    fcolors = (fv - fmin)/(fmax - fmin)    # normalize the values into range [0, 1]
+    fcolors[fcolors<0]=0
+    fig0 = _plt.figure(figsize=figsize)
+    ax0 = fig0.add_subplot(111)
+    cax0 = ax0.imshow(fv, extent=(0, 360, -90, 90), cmap=cmap, vmin=fmin, vmax=fmax, interpolation='nearest')
+    ax0.set(xlabel='longitude', ylabel='latitude')
+    if colorbar:
+        fig0.colorbar(cax0)
+    if show:
+        _plt.show()
+    return fig0, ax0

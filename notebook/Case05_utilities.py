@@ -1,5 +1,4 @@
 import numpy as np
-import scipy as sp
 import scipy.sparse as spm
 from scipy.io import loadmat, savemat
 
@@ -37,7 +36,7 @@ def Uvec2Tvec(Uvec, Cmat, Dmat, disp=False):
 
 def Tvec2Uvec(Tvec, Cmat, Dmat, disp=False):
     tic = time.time()
-    A = lsqr(Cmat, Tvec.T, atol=0, btol=0, conlim=0)
+    A = lsqr(Cmat, Tvec.T, atol=0, btol=0, conlim=0, iter_lim=1e7)
     #A_sol = spsolve(Cmat, Tvec.T)
     toc = time.time()
     A_sol = A[0]
@@ -46,6 +45,24 @@ def Tvec2Uvec(Tvec, Cmat, Dmat, disp=False):
     if disp:
         disp_index_sol = print_SH_mode(A_sol, m_dir=3, etol=1e-8)
     return Dmat.dot(A_sol)
+
+def SHmesh2Vec(xmesh, lmax=None, Complex=True):
+    nlat, nlon, nd = xmesh.shape
+    if not 2*(nlat - 1) == nlon - 1:
+        print('SHmesh2Vec: non-GLQ meshing is not supported!')
+        return -1
+    if lmax is None:
+        lmax = nlat - 1
+    if not Complex:
+        print('SHmesh2Vec: real spherical harmonic not supported!')
+    else:
+        xmesh = xmesh.astype(np.complex)
+        xvec = np.empty((nd, (lmax+1)**2), dtype=np.complex)
+    for k in range(nd):
+        xgrid = pyshtools.SHGrid.from_array(xmesh[...,k], grid='GLQ')
+        xcilm = xgrid.expand()
+        xvec[k, :] = SHCilmToVector(xcilm.to_array(), lmax=lmax)
+    return xvec.flatten()
 
 def SHVec2mesh(xvec, lat=None, lon=None, lmax=None, SphCoord=True, Complex=False):
     if lmax is None:
@@ -76,29 +93,32 @@ def SHVec2mesh(xvec, lat=None, lon=None, lmax=None, SphCoord=True, Complex=False
         else:
             Q = TransMat(t_mesh=90-lat, p_mesh=lon)
         xmesh = np.sum(Q*xmesh[...,np.newaxis,:], axis=-1)
-    return xmesh
+    return xmesh.real
 
-# visualizing SHvectors in 2D
-def visSHVec(xvec, lmax_plot=None, cmap='viridis', show=True, 
-             SphCoord=True, config_quiver=(2, 4, 'k', 1), n_vrange=None, s_vrange=None,
-             lonshift=0, Complex=False, figsize=(10, 5)):
-    xmesh = SHVec2mesh(xvec, lmax=lmax_plot, SphCoord=SphCoord, Complex=Complex)
+def vismesh(xmesh, cmap='viridis', show=False, SphCoord=True, 
+            config_quiver=(2, 4, 'k', 1), n_vrange=None, s_vrange=None,
+            lonshift=0, figsize=(10, 5)):
+    nlat, nlon, nd = xmesh.shape
+    if not (nlat - 1)*2 == (nlon - 1):
+        print('vismesh: only GLQ mesh is supported!')
+        return -1
+    lmax_plot = nlat - 1
     if SphCoord:
         fig = [None for _ in range(2)]
         ax = [None for _ in range(2)]
         xshear= np.linalg.norm(xmesh[...,1:], axis=-1)
         
-        fig[0], ax[0] = plotfv(xmesh[...,0], show=False, cmap=cmap,vrange=n_vrange,
+        fig[0], ax[0] = plotfv(xmesh[...,0], show=show, cmap=cmap,vrange=n_vrange,
                                lonshift=lonshift, figsize=figsize)
         ax[0].set_title('norm')
         
-        fig[1], ax[1] = plotfv(xshear, show=False, cmap='Reds', lonshift=lonshift, figsize=figsize, vrange=s_vrange)
+        fig[1], ax[1] = plotfv(xshear, show=show, cmap='Reds', lonshift=lonshift, figsize=figsize, vrange=s_vrange)
         latsdeg, lonsdeg = pyshtools.expand.GLQGridCoord(lmax_plot)
         lons, lats = np.meshgrid(lonsdeg, latsdeg)
         xshift = np.roll(xmesh, np.round(lons.shape[1]*lonshift/360).astype(np.int), axis=1)
         st, dq, color, scale = config_quiver
         ax[1].quiver(lons[::dq,st::dq], lats[::dq,st::dq], 
-                     xshift[::dq,st::dq,1], xshift[::dq,st::dq,2], 
+                     xshift[::dq,st::dq,2], -xshift[::dq,st::dq,1], 
                      color=color, scale=scale)
         ax[1].set_title('shear')
     else:
@@ -106,8 +126,19 @@ def visSHVec(xvec, lmax_plot=None, cmap='viridis', show=True,
         ax = [None for _ in range(3)]
         titlestr = ('x', 'y', 'z')
         for k in range(3):
-            fig[k], ax[k] = plotfv(xmesh[...,k], show=False, cmap=cmap, lonshift=lonshift, figsize=figsize)
+            fig[k], ax[k] = plotfv(xmesh[...,k], show=show, cmap=cmap, lonshift=lonshift, figsize=figsize)
             ax[k].set_title('$'+titlestr[k]+'$')
+    return fig, ax
+
+# visualizing SHvectors in 2D
+def visSHVec(xvec, lmax_plot=None, cmap='viridis', show=True, 
+             SphCoord=True, config_quiver=(2, 4, 'k', 1), n_vrange=None, s_vrange=None,
+             lonshift=0, Complex=False, figsize=(10, 5)):
+    if lmax_plot is None:
+        lmax_plot = np.sqrt(xvec.size//3).astype(np.int) - 1
+    xmesh = SHVec2mesh(xvec, lmax=lmax_plot, SphCoord=SphCoord, Complex=Complex)
+    fig, ax = vismesh(xmesh, cmap=cmap, show=False, SphCoord=SphCoord, config_quiver=config_quiver,
+                      n_vrange=n_vrange, s_vrange=s_vrange, lonshift=lonshift, figsize=figsize)
     if show:
         plt.show()
     return fig, ax

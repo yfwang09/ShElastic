@@ -386,12 +386,11 @@ def eval_GridC(coeff, latin, lonin, rin=1.0, lmax_calc=None, norm=None, shtype=N
 ########### visualization
 
 def plotfv(fv, figsize=(10,5), colorbar=True, show=True, vrange=None, cmap='viridis', lonshift=0):
-    """
-    Initialize the class instance from an input array.
+    """Initialize the class instance from an input array.
 
     Usage
     -----
-    fig, ax = SHUtil.plotfv(fv, [figsize, colorbar, show, vrange, cmap, lonshift])
+    fig, ax = plotfv(fv, [figsize, colorbar, show, vrange, cmap, lonshift])
 
     Returns
     -------
@@ -413,6 +412,7 @@ def plotfv(fv, figsize=(10,5), colorbar=True, show=True, vrange=None, cmap='viri
         Name of the colormap, see matplotlib
     lonshift : float, in degree, default = 0
         Shift the map along longitude direction by lonshift degree
+
     """
     if lonshift is not None:
         fv = _np.roll(fv, _np.round(fv.shape[1]*lonshift/360).astype(_np.int), axis=1)

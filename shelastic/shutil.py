@@ -6,11 +6,9 @@ utility functions
 
 import numpy as _np
 import scipy.sparse as _spm
-import matplotlib.pyplot as _plt
 import pyshtools as _psh
 
 # Functions for converting between Cartesian coordinates and spherical coordinates
-
 def CartCoord_to_SphCoord(X, Y, Z):
     """translate Cartesian coordinates into spherical coordinates
     
@@ -51,7 +49,7 @@ def SphCoord_to_CartCoord(R, THETA, PHI):
     return (X, Y, Z)
 
 def TransMat(t_mesh=None, p_mesh=None, lJmax=None):
-    """coordinate translation matrix for vector and tensor
+    """coordinate translation matrix for vectors and tensors
     
         Given theta, phi mesh, or lJmax value, return the translation
         matrix for vector and tensor. i.e. f = Q.dot(x)
@@ -92,7 +90,7 @@ def TransMat(t_mesh=None, p_mesh=None, lJmax=None):
 
     return Q
 
-# routines to calculate index for translating between cilm and vector
+# Routines to calculate index for translating between cilm and vector
 def lm2L(l, m):
     """translate 2d indices (l, m) to 1d index L"""
     return l**2 + (l + m)
@@ -190,9 +188,9 @@ def m_coeffs(lmax):
     m_list = _np.arange(lmax + 1)
     return _np.broadcast_to(m_list[_np.newaxis,_np.newaxis, :], (2, lmax+1, lmax+1))
 
-# routines for matrix shape transformation
+# Routines for matrix shape transformation
 def SHCilmToVector(cilm, lmax=None):
-    """This function convert SH array to 1d vector
+    """This function convert a SH array to an 1d vector
 
         Examples
         --------
@@ -218,7 +216,7 @@ def SHCilmToVector(cilm, lmax=None):
     return vec
 
 def SHVectorToCilm(vec, lmax=None):
-    """This function convert 1d vector to SH array
+    """This function convert an 1d vector to a SH array
 
         Examples
         --------
@@ -319,6 +317,106 @@ def dense_mode(mode, d, lmax):
 
     return M
 
+# Converting between SH coefficients and values on mesh points for SH vector (3x1)
+
+def SHmesh2Vec(xmesh, lmax=None, Complex=True):
+    """Transform a mesh point representation of SH vector to SH coefficients
+    
+        Spherical harmonics transform components of a SH 3-vector from GLQ mesh grid
+        to SH coefficients, for now it only supports GLQ-mesh.
+
+        Parameters
+        ----------
+        xmesh : ndarray, dimension (nlat, nlon, nd)
+            The mesh is in Cartesian coordinates
+            For GLQ mesh: nlat = lmax + 1; nlon = 2*lmax + 1;
+            For now the function only supports nd = 3;
+        lmax : int
+            maximum SH l-order
+        Complex : bool, only Complex=True is supported
+            Whether the output is real or complex spherical harmonics.
+
+        Returns
+        -------
+        ndarray, complex, dimension (nd*(lmax+1)^2, )
+            Coefficient representation of SH vector
+
+    """
+    nlat, nlon, nd = xmesh.shape
+    if not 2*(nlat - 1) == nlon - 1:
+        print('SHmesh2Vec: non-GLQ meshing is not supported!')
+        return -1
+    if lmax is None:
+        lmax = nlat - 1
+    if not Complex:
+        print('SHmesh2Vec: real spherical harmonic not supported!')
+    else:
+        xmesh = xmesh.astype(_np.complex)
+        xvec = _np.empty((nd, (lmax+1)**2), dtype=_np.complex)
+    for k in range(nd):
+        xgrid = _psh.SHGrid.from_array(xmesh[...,k], grid='GLQ')
+        xcilm = xgrid.expand()
+        xvec[k, :] = SHCilmToVector(xcilm.to_array(), lmax=lmax)
+    return xvec.flatten()
+
+def SHVec2mesh(xvec, lat=None, lon=None, lmax=None, SphCoord=True, Complex=False):
+    """Transform Coefficients of SH vector to mesh point representation
+    
+        Spherical harmonics transform components of a SH 3-vector from SH coefficients
+        to mesh grids (inCartesian or spherical coordinates), for now it supports
+        GLQ-mesh or irregular mesh (given lat and lon values).
+
+        Parameters
+        ----------
+        xvec : ndarray, complex, dimension (nd*(lmax+1)^2, )
+            SH coefficient representation of the SH vector
+            For now the function only supports nd = 3;
+        lat,lon : array-like, degree
+            A list of lattitude and longitude location of irregular mesh points
+        lmax : int
+            maximum SH l-order
+        SphCoord : bool
+            Whether the mesh grid is in spherical or Cartesian coordinates
+        Complex : bool, only Complex=True is supported
+            Whether the output is real or complex spherical harmonics
+
+        Returns
+        -------
+        ndarray, dimension (lmax+1, 2*lmax+1, nd)
+            Mesh point representation of SH vector
+
+    """
+    if lmax is None:
+        lmax = (_np.sqrt(xvec.size/3) - 1).astype(_np.int)
+    cvec = xvec.reshape(3, -1)
+    nvec = cvec.shape[1]
+    xmesh= [None for _ in range(3)]
+    for k in range(3):
+        if Complex:
+            cext = _np.zeros((lmax+1)**2, dtype=_np.complex)
+            cext[:nvec] = cvec[k, :(lmax+1)**2]
+            cilm = SHVectorToCilm(cext)
+        else:
+            cext = _np.zeros((lmax+1)**2)
+            cext[:nvec] = cvec[k, :(lmax+1)**2]
+            cilm = _psh.shio.SHVectorToCilm(cext)
+        coeffs = _psh.SHCoeffs.from_array(cilm)
+        if (lat is None) and (lon is None):
+            grid = coeffs.expand('GLQ')
+            xmesh[k] = grid.to_array().real
+        else:
+            grid = coeffs.expand(lon=lon, lat=lat)
+            xmesh[k] = grid.real
+    xmesh = _np.stack(xmesh, axis=-1)
+    if SphCoord:
+        if (lat is None) and (lon is None):
+            Q = TransMat(lJmax=lmax)
+        else:
+            Q = TransMat(t_mesh=_np.radian(90-lat), p_mesh=_np.radian(lon))
+        xmesh = _np.sum(Q*xmesh[...,_np.newaxis,:], axis=-1)
+    return xmesh.real
+
+# Temporary alternative for SHComplexCoeffs.expand(lat=lat, lon=lon)
 def eval_GridC(coeff, latin, lonin, rin=1.0, lmax_calc=None, norm=None, shtype=None):
     """Evaluate values of solid spherical harmonics on grids
     
@@ -382,52 +480,3 @@ def eval_GridC(coeff, latin, lonin, rin=1.0, lmax_calc=None, norm=None, shtype=N
                                                 lmax=lmax_calc, norm=norm, 
                                                 csphase=coeff.csphase)
     return values
-
-########### visualization
-
-def plotfv(fv, figsize=(10,5), colorbar=True, show=True, vrange=None, cmap='viridis', lonshift=0):
-    """Initialize the class instance from an input array.
-
-    Usage
-    -----
-    fig, ax = plotfv(fv, [figsize, colorbar, show, vrange, cmap, lonshift])
-
-    Returns
-    -------
-    fig, ax : matplotlib figure and axis instances
-
-    Parameters
-    ----------
-    fv : ndarray, shape (nlat, nlon)
-        2-D numpy array of the gridded data, where nlat and nlon are the
-        number of latitudinal and longitudinal bands, respectively.
-    figsize : size of the figure, optional, default = (10, 5)
-    colorbar : bool, optional, default = True
-        If True (default), plot the colorbar along with the map
-    show : bool, optional, default = True
-        If True, plot the image to the screen.
-    vrange : 2-element tuple, optional
-        The range of the colormap, default is (min, max)
-    cmap : string, default = 'viridis'
-        Name of the colormap, see matplotlib
-    lonshift : float, in degree, default = 0
-        Shift the map along longitude direction by lonshift degree
-
-    """
-    if lonshift is not None:
-        fv = _np.roll(fv, _np.round(fv.shape[1]*lonshift/360).astype(_np.int), axis=1)
-    if vrange is None:
-        fmax, fmin = fv.max(), fv.min()
-    else:
-        fmin, fmax = vrange
-    fcolors = (fv - fmin)/(fmax - fmin)    # normalize the values into range [0, 1]
-    fcolors[fcolors<0]=0
-    fig0 = _plt.figure(figsize=figsize)
-    ax0 = fig0.add_subplot(111)
-    cax0 = ax0.imshow(fv, extent=(0, 360, -90, 90), cmap=cmap, vmin=fmin, vmax=fmax, interpolation='nearest')
-    ax0.set(xlabel='longitude', ylabel='latitude')
-    if colorbar:
-        fig0.colorbar(cax0)
-    if show:
-        _plt.show()
-    return fig0, ax0

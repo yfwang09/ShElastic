@@ -245,7 +245,7 @@ def coeffs2dr(uvec, f_interp=None, lmax=None, X0=None, Complex=False,
     if lmax is None:
         lmax = np.sqrt(uvec.size/3).astype(np.int) - 1
     nvec = (lmax+1)**2; 
-    if norm_order > 1: #== np.inf:
+    if norm_order == np.inf:
         nmesh = 1
     else:
         nmesh = (lmax+1)*(2*lmax+1)
@@ -281,7 +281,7 @@ def coeffs2dr(uvec, f_interp=None, lmax=None, X0=None, Complex=False,
     return np.linalg.norm(norm2.flatten(), ord=norm_order)/nmesh
 
 def coeffs2dist(uvec, Xt=None, f_cached=None, lmax=None, X0=None, Complex=False, 
-                lat_weights=1, vert_weight=1, l_weight=None, debug=False):
+                lat_weights=1, vert_weight=1, l_weight=None, l_norm='mean', debug=False):
     #### shape difference from SH vectors
     ## uvec: Input real SH vector (3x(lmax+1)^2)
     ## Xt: Input shape data (nv x 3) or (nf x 3 x 3); can be full list or neighbor list
@@ -357,7 +357,11 @@ def coeffs2dist(uvec, Xt=None, f_cached=None, lmax=None, X0=None, Complex=False,
         regularization = 0
     else:
         regularization = np.linalg.norm(np.tile(l_weight, 3)*uvec)
-    return np.mean(d2surf*lat_weights) + regularization*0.05
+    
+    if lnorm == 'max':
+        return np.max(d2surf*lat_weights)
+    else:
+        return np.mean(d2surf*lat_weights) + regularization*0.05
 
 # target functions
 
@@ -381,15 +385,19 @@ def sol2dr(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None,
             tmesh[..., k] = tgrid.to_array().real
         if isTfv.dtype == np.bool:
             tvalues = np.sum((tmesh[isTfv, :]*vert_weight)**2, axis=-1)
-            Tdist = np.mean(tvalues*lat_weights[isTfv]**2)
+            lat_weights_value = lat_weights[isTfv]**2
         else:
             tvalues = np.sum((tmesh * vert_weight)**2, axis=-1)*isTfv
-            Tdist = np.mean(tvalues*lat_weights**2)
+            lat_weights_value = lat_weights**2
+        if norm_order > 1:
+            Tdist = np.linalg.norm(tvalues*lat_weights_value, ord=norm_order)
+        else:
+            Tdist = np.mean(tvalues*lat_weights_value)
     Uvec = Dmat.dot(aK)    
     Udist = coeffs2dr(Uvec, f_interp=f_interp, lmax=lmax, X0=X0, Complex=True,
                       lat_weights=lat_weights, vert_weight=vert_weight, norm_order=norm_order)
-    #regularization = np.vdot(Uvec, Tvec).real*2*np.pi
-    regularization = np.vdot(Uvec, Uvec*l_weight).real + alpha*np.vdot(Tvec, Tvec*l_weight).real
+    regularization = np.vdot(Uvec, Tvec).real*2*np.pi
+    #regularization = np.vdot(Uvec, Uvec*l_weight).real + alpha*np.vdot(Tvec, Tvec*l_weight).real
     #regularization = np.vdot(aK, aK*l_weight).real
     if separate:
         E = np.vdot(Uvec, Tvec).real*2*np.pi
@@ -399,7 +407,7 @@ def sol2dr(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None,
 # target function
 def sol2dist(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None, 
              f_cached=None, lmax=None, X0=None, Xt=None,
-             lat_weights=None, vert_weight=1, l_weight=None, separate=False):
+             lat_weights=None, vert_weight=1, lnorm='mean', separate=False):
     if lat_weights is None:
         lat_weights = np.ones((lmax+1, 2*lmax+1))
     if np.nonzero(isTfv)[0].size == 0:
@@ -419,10 +427,13 @@ def sol2dist(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None,
             Tdist = np.mean(tvalues*lat_weights[isTfv]**2)
         else:
             tvalues = np.sum((tmesh * vert_weight)**2, axis=-1)*isTfv
-            Tdist = np.mean(tvalues*lat_weights**2)
+            if lnorm == 'max':
+                Tdist = np.max(tvalues*lat_weights**2)
+            else:
+                Tdist = np.mean(tvalues*lat_weights**2)
     Uvec = Dmat.dot(aK)
     Udist = coeffs2dist(Uvec, Xt=Xt, f_cached=f_cached, lmax=lmax, X0=X0, Complex=True,
-                        lat_weights=lat_weights, vert_weight=vert_weight)
+                        lat_weights=lat_weights, vert_weight=vert_weight, lnorm=lnorm)
     regularization = np.vdot(aK, aK*l_weight).real
     if separate:
         return (Udist, Tdist, regularization)
@@ -430,13 +441,13 @@ def sol2dist(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None,
 
 # output of the target function
 def sol2dist_verbose(Asol, r0=1, mu0=1):
-    mean_dist = np.sqrt(Asol[0])*r0
-    mean_T = np.sqrt(Asol[1])*mu0
-    print('  mean shape difference = %.4fum'%mean_dist)
-    print('  mean |T| in free surface = %.4fPa'%mean_T)
+    norm_dist = np.sqrt(Asol[0])*r0
+    norm_T = np.sqrt(Asol[1])*mu0
+    print('  shape difference = %.4fum'%norm_dist)
+    print('  |T| in free surface = %.4fPa'%norm_T)
     print('  regularization = %e'%Asol[2])
     print('  Energy = %epJ'%(Asol[3]*(r0/1e6)**3*mu0*1e12))
-    return (mean_dist, mean_T)
+    return (norm_dist, norm_T)
 
 # update the arguments of the target function
 def sol2dist_update(AK_iter, args, file_neigh):

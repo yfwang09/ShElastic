@@ -1,7 +1,13 @@
+"""
+shbv
+====
+Functions for solving boundary-value problems
+"""
+
 import numpy as _np
 import scipy.sparse as _spm
+from scipy.sparse.linalg import lsqr, spsolve
 from scipy.special import sph_harm
-import matplotlib.pyplot as _plt
 from shelastic.shelastic import calUmode, calSmode
 from shelastic.shutil import SHCilmToVector, CartCoord_to_SphCoord, K2lmk
 from time import time
@@ -76,6 +82,23 @@ def generate_submat(modes, mu, nu, lmax_col, lmax_row, shtype='irr', verbose=Fal
     return submat
 
 def print_SH_mode(vec, m_dir=3, etol=1e-8, verbose=True):
+    '''Return the index - coefficient representation from a SH vector
+    
+    Parameters
+    ----------
+    vec : array-like
+        Complex spherical harmonic vector
+    m_dir : deprecated
+    etol : float
+        Tolerance that filters the coefficients
+    verbose : bool
+        If true, print index and coefficients below etol
+
+    Returns
+    -------
+    idx_mode : object list
+        every item is a tuple with (index, coefficient)
+    '''
     # vec is a *complex* spherical harmonic vector
     # with m different directions
     idx_type = [('index', '<i4', 3), ('coeff', _np.complex_)]
@@ -91,7 +114,82 @@ def print_SH_mode(vec, m_dir=3, etol=1e-8, verbose=True):
             idx_mode = _np.append(idx_mode, new_idx)
     return idx_mode
 
+# Procedures for transformation between Uvec and Tvec
+def Uvec2Tvec(Uvec, Cmat, Dmat, disp=False):
+    '''Solve traction in spherical harmonics space
+    
+    Parameters
+    ----------
+    Uvec : ndarray, dimension (3*(lmax+1)^2, )
+        Coefficient representation of displacement SH vector
+    Cmat,Dmat : csr_matrix, 
+        Coefficient matrices for traction(Cmat) and displacement(Dmat)
+    disp: bool
+        if True, print solution
+    
+    Returns
+    -------
+    ndarray, dimension (3*(lmax+1)^2, )
+        Coefficient representation of traction SH vector
+        
+    '''
+    tic = time()
+    B_sol = spsolve(Dmat, Uvec.T)
+    print('Time: %.4fs'%(time()-tic))
+    if disp:
+        disp_index_sol = print_SH_mode(B_sol, m_dir=3, etol=1e-8)
+    return Cmat.dot(B_sol)
+
+def Tvec2Uvec(Tvec, Cmat, Dmat, disp=False):
+    '''Solve displacement in spherical harmonics space
+    
+    Parameters
+    ----------
+    Tvec : ndarray, dimension (3*(lmax+1)^2, )
+        Coefficient representation of traction SH vector
+    Cmat,Dmat : csr_matrix, 
+        Coefficient matrices for traction(Cmat) and displacement(Dmat)
+    disp: bool
+        if True, print solution
+    
+    Returns
+    -------
+    ndarray, dimension (3*(lmax+1)^2, )
+        Coefficient representation of displacement SH vector
+        
+    '''
+    tic = time.time()
+    A = lsqr(Cmat, Tvec.T, atol=0, btol=0, conlim=0, iter_lim=1e7)
+    A_sol = A[0]
+    print('Residual:', A[3], 'Solution:', A_sol.size, 'Time: %.4fs'%(time()-tic))
+    if disp:
+        disp_index_sol = print_SH_mode(A_sol, m_dir=3, etol=1e-8)
+    return Dmat.dot(A_sol)
+
 def fast_displacement_solution(aK, X, Y, Z, Umodes, lKmax=50, lJmax=53, shtype='irr', verbose=True):
+    '''Evaluate spherical harmonic displacement solution on grid points
+    
+    Parameters
+    ----------
+    aK : ndarray, dimension (3*(lmax+1)^2, )
+        Coefficient representation of spherical harmonic solution
+    X,Y,Z : array-like, same dimension
+        Grid points where the spherical harmonic displacement solution being evaluated
+    Umodes : dict
+        Loaded from `Umodes.mat`
+    lKmax,lJmax : int
+        lmax order for columns and rows
+    shtype : string, ['irr' or 'reg']
+        'irr' represents irregular spherical harmonics for spherical void
+        'reg' represents regular spherical harmonics for solid sphere
+    verbose : bool, not used
+    
+    Returns
+    -------
+    ndarray, dimension (X.shape, 3)
+        Displacement on the grid points (X,Y,Z)
+
+    '''
     R, THETA, PHI = CartCoord_to_SphCoord(X, Y, Z)
     disp = _np.zeros(X.shape+(3,lKmax+1), dtype=_np.complex)
     lats = _np.pi/2-THETA; lat_d = _np.rad2deg(lats); 
@@ -121,6 +219,29 @@ def fast_displacement_solution(aK, X, Y, Z, Umodes, lKmax=50, lJmax=53, shtype='
     return disp.sum(axis=-1)
 
 def fast_stress_solution(aK, X, Y, Z, Smodes, lKmax=50, lJmax=53, shtype='irr', verbose=True):
+    '''Evaluate spherical harmonic stress solution on grid points
+    
+    Parameters
+    ----------
+    aK : ndarray, dimension (3*(lmax+1)^2, )
+        Coefficient representation of spherical harmonic solution
+    X,Y,Z : array-like, same dimension
+        Grid points where the spherical harmonic displacement solution being evaluated
+    Smodes : dict
+        Loaded from `Smodes.mat`
+    lKmax,lJmax : int
+        lmax order for columns and rows
+    shtype : string, ['irr' or 'reg']
+        'irr' represents irregular spherical harmonics for spherical void
+        'reg' represents regular spherical harmonics for solid sphere
+    verbose : bool, not used
+    
+    Returns
+    -------
+    ndarray, dimension (X.shape, 3, 3)
+        Stress on the grid points (X,Y,Z)
+
+    '''
     R, THETA, PHI = CartCoord_to_SphCoord(X, Y, Z)
     sigma = _np.zeros(X.shape+(3,3,lKmax+1), dtype=_np.complex)
     lats = _np.pi/2-THETA; lat_d = _np.rad2deg(lats); 
@@ -151,6 +272,27 @@ def fast_stress_solution(aK, X, Y, Z, Smodes, lKmax=50, lJmax=53, shtype='irr', 
     return sigma.sum(axis=-1).real
 
 def fast_energy_solution(A_sol, Dmat, Cmat, Ac_sol=None, Dcmat=None, Ccmat=None):
+    '''Evaluate elastic energy of a set of spherical harmonic solution
+    
+    Parameters
+    ----------
+    A_sol : ndarray, dimension (3*(lmax+1)^2, )
+        Coefficient representation of spherical harmonic solution
+    Dmat,Cmat : lil_matrix
+        Displacement and traction coefficient matrices
+    Ac_sol : ndarray, dimension (3*(lmax+1)^2, ), optional
+        If used, calculate the elastic energy for spherical void;
+        otherwise, calculate the elastic energy for solid sphere;
+    Dcmat,Ccmat : lil_matrix
+        Displacement and traction coefficient matrices for calculating core energy
+    
+    Returns
+    -------
+    real
+        Elastic energy of the spherical harmonic solution A_sol (and Ac_sol if
+        the configuration is spherical void)
+
+    '''
     Uvec = Dmat.dot(A_sol)
     Tvec = Cmat.dot(A_sol)
     if (Dcmat is not None) and (Ccmat is not None):
@@ -161,43 +303,3 @@ def fast_energy_solution(A_sol, Dmat, Cmat, Ac_sol=None, Dcmat=None, Ccmat=None)
         Ecore = 0
 
     return -Ecore + 2*_np.pi*_np.vdot(Uvec, Tvec).real
-
-def visualize_Cmat(Csub, precision=1e-8, m_max=3):
-    _plt.spy(Csub, precision=precision, markersize = 3)
-    mode_sub = _np.int(_np.sqrt(Csub.shape[1]/m_max))-1
-    lmax_sub = _np.int(_np.sqrt(Csub.shape[0]/3))-1
-    print(mode_sub, lmax_sub)
-    lsy = _np.arange(0, lmax_sub+1)
-    lsx = _np.arange(0, mode_sub+1)
-
-    x_range = [0, Csub.shape[1]]
-    y_range = [0, Csub.shape[0]]
-    # traction direction dividing line:
-    for i in range(1, 3+1):
-        y_divide = y_range[1]*i/3
-        _plt.plot(x_range, _np.ones(2)*y_divide-0.5)
-        y_text = y_divide - y_range[1]/m_max/2
-        #_plt.text(-mode_sub-5, y_text, '$T_'+str(i)+'$', fontsize=24)
-    # mode dividing line:
-    for i in range(1, m_max+1):
-        x_divide = x_range[1]*i/m_max
-        _plt.plot(_np.ones(2)*x_divide-0.5, y_range)
-        x_text = x_divide - x_range[1]/3/2 - 1
-        #_plt.text(x_text, -lmax_sub, '$\\psi_'+str(i)+'$', fontsize=24)
-
-    # ticks for different traction directions
-    ticks_y = _np.array([])
-    for i in range(3):
-        ticks_Ti = i*(lmax_sub+1)**2+lsy**2
-        ticks_y = _np.hstack((ticks_y, ticks_Ti))
-    _plt.yticks(ticks_y, _np.tile(lsy, 3))
-    # ticks for different modes
-    ticks_x = _np.array([])
-    for i in range(m_max):
-        ticks_Psi_i = i*(mode_sub+1)**2+lsx**2
-        ticks_x = _np.hstack((ticks_x, ticks_Psi_i))
-    _plt.xticks(ticks_x, _np.tile(lsx, m_max))
-    if m_max == 4:
-        _plt.title('Solution A+B', fontsize=24)
-    else:
-        _plt.title('Solution B', fontsize=24)

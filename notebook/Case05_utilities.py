@@ -19,7 +19,7 @@ from SHBV import generate_submat, visualize_Cmat, print_SH_mode
 
 from scipy.sparse.linalg import lsqr, spsolve
 from scipy.interpolate import RectBivariateSpline
-from scipy.optimize import minimize
+from scipy.optimize import minimize, basinhopping
 
 # procedures for transformation between Uvec and Tvec
 def Uvec2Tvec(Uvec, Cmat, Dmat, disp=False):
@@ -29,8 +29,8 @@ def Uvec2Tvec(Uvec, Cmat, Dmat, disp=False):
     toc = time.time()
     #B_sol = B[0]
     #print('Residual:', B[3], 'Time:', toc-tic, 'Solution:', B_sol.size)
-    print('Time: %.4fs'%(toc-tic))
     if disp:
+        print('Time: %.4fs'%(toc-tic))
         disp_index_sol = print_SH_mode(B_sol, m_dir=3, etol=1e-8)
     return Cmat.dot(B_sol)
 
@@ -40,9 +40,9 @@ def Tvec2Uvec(Tvec, Cmat, Dmat, disp=False):
     #A_sol = spsolve(Cmat, Tvec.T)
     toc = time.time()
     A_sol = A[0]
-    print('Residual:', A[3], 'Time:', toc-tic, 'Solution:', A_sol.size)
-    print('Time: %.4fs'%(toc-tic))
     if disp:
+        print('Residual:', A[3], 'Time:', toc-tic, 'Solution:', A_sol.size)
+        print('Time: %.4fs'%(toc-tic))
         disp_index_sol = print_SH_mode(A_sol, m_dir=3, etol=1e-8)
     return Dmat.dot(A_sol)
 
@@ -228,6 +228,43 @@ def SHvec_ctor(xvec):
     ccilm[1,...] = cilm[0,...].imag
     rcilm = pyshtools.shio.SHctor(ccilm)
     return pyshtools.shio.SHCilmToVector(rcilm)
+
+def AKreal2comp(AKreal, lmax):
+    size = AKreal.size
+    Kind = np.arange(size)
+    ls, ms, ks = K2lmk(Kind, lmax=lmax)
+
+    P = spm.lil_matrix((size, size), dtype=np.complex)
+    C = 1/np.sqrt(2)
+    P[ms == 0, ms == 0] = 1
+    positive_ms_K, = np.nonzero(ms > 0)
+    Kls, Kms, Kks = K2lmk(positive_ms_K, lmax=lmax)
+    negative_ms_K = lmk2K(Kls,-Kms, Kks,lmax=lmax)
+    p1= (-1)**np.abs(Kms)
+    P[(positive_ms_K, positive_ms_K)] = C
+    P[(positive_ms_K, negative_ms_K)] =-1.j * C
+    P[(negative_ms_K, positive_ms_K)] = p1 * C
+    P[(negative_ms_K, negative_ms_K)] = 1.j * p1 * C
+
+    return P.tocsc().dot(AKreal)
+
+def AKcomp2real(AKcomp, lmax):
+    size = AKcomp.size
+    Kind = np.arange(size)
+    ls, ms, ks = K2lmk(Kind, lmax=lmax)
+
+    Q = spm.lil_matrix((size, size), dtype=np.complex)
+    C = 1/np.sqrt(2)
+    Q[ms == 0, ms == 0] = 1
+    positive_ms_K, = np.nonzero(ms > 0)
+    Kls, Kms, Kks = K2lmk(positive_ms_K, lmax=lmax)
+    negative_ms_K = lmk2K(Kls,-Kms, Kks,lmax=lmax)
+    p1= (-1)**np.abs(Kms)
+    Q[(positive_ms_K, positive_ms_K)] = C
+    Q[(positive_ms_K, negative_ms_K)] = p1 * C
+    Q[(negative_ms_K, positive_ms_K)] = 1.j * C
+    Q[(negative_ms_K, negative_ms_K)] =-1.j * p1 * C
+    return Q.tocsc().dot(AKcomp).real
 
 # coefficients to shape-distance
 
@@ -443,8 +480,8 @@ def sol2dist(aK, Cmat, Dmat, alpha = 0.05, beta=0.05, isTfv=None,
 def sol2dist_verbose(Asol, r0=1, mu0=1):
     norm_dist = np.sqrt(Asol[0])*r0
     norm_T = np.sqrt(Asol[1])*mu0
-    print('  shape difference = %.4fum'%norm_dist)
-    print('  |T| in free surface = %.4fPa'%norm_T)
+    print('  shape difference = %.4eum'%norm_dist)
+    print('  |T| in free surface = %.4ePa'%norm_T)
     print('  regularization = %e'%Asol[2])
     print('  Energy = %epJ'%(Asol[3]*(r0/1e6)**3*mu0*1e12))
     return (norm_dist, norm_T)
@@ -466,7 +503,11 @@ def sol2dist_update(AK_iter, args, file_neigh):
 
 # minimization algorithm
 
-def minimize_AK(AK_init, target, args, iter_config, verbose=None, verbose_args=(), AKfile='', fvfile='', file_neigh=''):
+def print_fun(x, f, accepted):
+    print(x, "at minimum %.4f accepted %d" % (f, int(accepted)))
+
+def minimize_AK(AK_init, target, args, iter_config, use_basinhopping=False,
+                verbose=None, verbose_args=(), AKfile='', fvfile='', file_neigh=''):
     #### optimization iteration wrapper
     ## AK_init: Initial guess of the AK solution
     ## target: target function, arguments (AK_init, *args, verbose)
@@ -477,7 +518,7 @@ def minimize_AK(AK_init, target, args, iter_config, verbose=None, verbose_args=(
     ## AKfile, fvfile: save current AK and iteration history.
     ## f_neigh: neighbor list file
 
-    magnify = 1e4
+    magnify = 1
     # print initial settings
     if os.path.exists(AKfile):
         AK_iter = np.load(AKfile)
@@ -509,9 +550,14 @@ def minimize_AK(AK_init, target, args, iter_config, verbose=None, verbose_args=(
 
         print(' period %d/%d'%(i, N_period))
         tic = time.time()
-        magnified_target = lambda AK : target(AK, *args)*magnify
-        AK_min = minimize(magnified_target, AK_iter, #args=args,
-                          method=minimizer, options=minimizer_config)
+        magnified_target = lambda AK : target(AK, *args) #*magnify
+        if use_basinhopping:
+            minimizer_kwargs = {"method":minimizer, 'options':minimizer_config} #{'maxiter':minimizer_config['maxiter']}}
+            AK_min = basinhopping(magnified_target, AK_iter, T=10, minimizer_kwargs=minimizer_kwargs,
+                                  niter=use_basinhopping, disp=True, callback=print_fun)
+        else:
+            AK_min = minimize(magnified_target, AK_iter, #args=args,
+                              method=minimizer, options=minimizer_config)
         toc = time.time()
         print('  period %d: F = %.4e, time: %.4fs'%(i, AK_min.fun/magnify, toc-tic))
         

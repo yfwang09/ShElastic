@@ -7,6 +7,9 @@ Functions for visualizing spherical harmonic solutions
 import numpy as _np
 import scipy.sparse as _spm
 import matplotlib.pyplot as _plt
+from mpl_toolkits.mplot3d import Axes3D
+import pyshtools as _psh
+from shelastic.shutil import SHVec2mesh
 
 def plotfv(fv, figsize=(10,5), colorbar=True, show=True, vrange=None, cmap='viridis', lonshift=0):
     """Plot a color map of a 2d function
@@ -108,7 +111,7 @@ def vismesh(xmesh, cmap='viridis', show=False, SphCoord=True,
         ax[0].set_title('norm')
         
         fig[1], ax[1] = plotfv(xshear, show=show, cmap='Reds', lonshift=lonshift, figsize=figsize, vrange=s_vrange)
-        latsdeg, lonsdeg = pyshtools.expand.GLQGridCoord(lmax_plot)
+        latsdeg, lonsdeg = _psh.expand.GLQGridCoord(lmax_plot)
         lons, lats = _np.meshgrid(lonsdeg, latsdeg)
         xshift = _np.roll(xmesh, _np.round(lons.shape[1]*lonshift/360).astype(_np.int), axis=1)
         st, dq, color, scale = config_quiver
@@ -206,49 +209,49 @@ def visSH3d(xmesh, cmesh=None, r0=1, lmax_plot=None,
     """
     if lmax_plot is None:
         lmax_plot = xmesh.shape[0] - 1
-    lats, lons = pyshtools.expand.GLQGridCoord(lmax_plot)
+    lats, lons = _psh.expand.GLQGridCoord(lmax_plot)
     nlat = lats.size; nlon = lons.size;
 
-    lats_circular = np.hstack(([90.], lats, [-90.]))
-    lons_circular = np.append(lons, [lons[0]])
-    u = np.radians(lons_circular)
-    v = np.radians(90. - lats_circular)
-    normvec = np.zeros((nlat+2, nlon+1, 3))
-    normvec[...,0] = np.sin(v)[:, None] * np.cos(u)[None, :]
-    normvec[...,1] = np.sin(v)[:, None] * np.sin(u)[None, :]
-    normvec[...,2] = np.cos(v)[:, None] * np.ones_like(lons_circular)[None, :]
+    lats_circular = _np.hstack(([90.], lats, [-90.]))
+    lons_circular = _np.append(lons, [lons[0]])
+    u = _np.radians(lons_circular)
+    v = _np.radians(90. - lats_circular)
+    normvec = _np.zeros((nlat+2, nlon+1, 3))
+    normvec[...,0] = _np.sin(v)[:, None] * _np.cos(u)[None, :]
+    normvec[...,1] = _np.sin(v)[:, None] * _np.sin(u)[None, :]
+    normvec[...,2] = _np.cos(v)[:, None] * _np.ones_like(lons_circular)[None, :]
 
-    upoints = np.zeros((nlat + 2, nlon + 1, 3))
+    upoints = _np.zeros((nlat + 2, nlon + 1, 3))
     upoints[1:-1, :-1, :] = xmesh
-    upoints[0, :, :] = np.mean(xmesh[0,:,:], axis=0)  # not exact !
-    upoints[-1, :, :] = np.mean(xmesh[-1,:,:], axis=0)  # not exact !
+    upoints[0, :, :] = _np.mean(xmesh[0,:,:], axis=0)  # not exact !
+    upoints[-1, :, :] = _np.mean(xmesh[-1,:,:], axis=0)  # not exact !
     upoints[1:-1, -1, :] = xmesh[:, 0, :]
     upoints *= r0
     
-    x = r0 * np.sin(v)[:, None] * np.cos(u)[None, :]  + upoints[..., 0]
-    y = r0 * np.sin(v)[:, None] * np.sin(u)[None, :] + upoints[..., 1]
-    z = r0 * np.cos(v)[:, None] * np.ones_like(lons_circular)[None, :] + upoints[...,2]
+    x = r0 * _np.sin(v)[:, None] * _np.cos(u)[None, :]  + upoints[..., 0]
+    y = r0 * _np.sin(v)[:, None] * _np.sin(u)[None, :] + upoints[..., 1]
+    z = r0 * _np.cos(v)[:, None] * _np.ones_like(lons_circular)[None, :] + upoints[...,2]
 
     if color is None:
         if cmesh is None:
-            magn_point = np.sum(normvec * upoints, axis=-1)
+            magn_point = _np.sum(normvec * upoints, axis=-1)
         else:
-            tpoints = np.zeros((nlat + 2, nlon + 1, 3))
+            tpoints = _np.zeros((nlat + 2, nlon + 1, 3))
             tpoints[1:-1, :-1, :] = cmesh
-            tpoints[0, :, :] = np.mean(cmesh[0,:,:], axis=0)  # not exact !
-            tpoints[-1, :, :] = np.mean(cmesh[-1,:,:], axis=0)  # not exact !
+            tpoints[0, :, :] = _np.mean(cmesh[0,:,:], axis=0)  # not exact !
+            tpoints[-1, :, :] = _np.mean(cmesh[-1,:,:], axis=0)  # not exact !
             tpoints[1:-1, -1, :] = cmesh[:, 0, :]
-            magn_point = np.sum(normvec * tpoints, axis=-1)
+            magn_point = _np.sum(normvec * tpoints, axis=-1)
         magn_face = 1./4. * (magn_point[1:, 1:] + magn_point[:-1, 1:] +
                              magn_point[1:, :-1] + magn_point[:-1, :-1])
-        magnmax_face = np.max(np.abs(magn_face))
-        magnmax_point = np.max(np.abs(magn_point))
-        norm = plt.Normalize(-magnmax_face / 2., magnmax_face / 2., clip=True)
-        cmap = plt.get_cmap('RdBu_r')
+        magnmax_face = _np.max(_np.abs(magn_face))
+        magnmax_point = _np.max(_np.abs(magn_point))
+        norm = _plt.Normalize(-magnmax_face / 2., magnmax_face / 2., clip=True)
+        cmap = _plt.get_cmap('RdBu_r')
         colors = cmap(norm(magn_face.flatten()))
         colors = colors.reshape(nlat + 1, nlon, 4)
 
-    fig = plt.figure(figsize=figsize)
+    fig = _plt.figure(figsize=figsize)
     ax3d = fig.add_subplot(1, 1, 1, projection='3d')
     if surface:
         if color is None:

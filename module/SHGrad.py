@@ -1,6 +1,6 @@
 import numpy as _np
 import scipy as _sp
-from scipy.misc import factorial
+from scipy.special import factorial
 import matplotlib.pyplot as _plt
 import pyshtools as _psh
 from SHUtil import l_coeffs, LM_list

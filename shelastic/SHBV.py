@@ -135,8 +135,8 @@ def Uvec2Tvec(Uvec, Cmat, Dmat, disp=False):
     '''
     tic = time()
     B_sol = spsolve(Dmat, Uvec.T)
-    print('Time: %.4fs'%(time()-tic))
     if disp:
+        print('Time: %.4fs'%(time()-tic))
         disp_index_sol = print_SH_mode(B_sol, m_dir=3, etol=1e-8)
     return Cmat.dot(B_sol)
 
@@ -158,11 +158,11 @@ def Tvec2Uvec(Tvec, Cmat, Dmat, disp=False):
         Coefficient representation of displacement SH vector
         
     '''
-    tic = time.time()
+    tic = time()
     A = lsqr(Cmat, Tvec.T, atol=0, btol=0, conlim=0, iter_lim=1e7)
     A_sol = A[0]
-    print('Residual:', A[3], 'Solution:', A_sol.size, 'Time: %.4fs'%(time()-tic))
     if disp:
+        print('Residual:', A[3], 'Solution:', A_sol.size, 'Time: %.4fs'%(time()-tic))
         disp_index_sol = print_SH_mode(A_sol, m_dir=3, etol=1e-8)
     return Dmat.dot(A_sol)
 

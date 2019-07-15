@@ -6,7 +6,7 @@ spherical harmonic coefficients
 """
 
 import numpy as _np
-from scipy.misc import factorial
+from scipy.special import factorial
 import pyshtools as _psh
 from shelastic.shutil import l_coeffs, LM_list
 

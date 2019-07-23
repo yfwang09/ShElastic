@@ -90,6 +90,33 @@ def TransMat(t_mesh=None, p_mesh=None, lJmax=None):
 
     return Q
 
+def GLQCartCoord(lmax):
+    '''Compute the Cartesian coordinates used in Gauss-Legendre quadrature grids on 
+       a unit sphere.
+
+        Usage
+        -----
+        X0 = GLQCartCoord (lmax)
+
+        Returns
+        -------
+        X0 : float, dimension (lmax+1, 2*lmax+1, 3)
+            The Cartesian coordinates of a GLQ grid on a unit sphere
+
+        Parameters
+        ----------
+        lmax : integer
+            The maximum spherical harmonic degree that will be integrated exactly by
+            Gauss-Legendre quadrature.
+    '''
+    latsdeg, lonsdeg = _psh.expand.GLQGridCoord(lmax)
+    lon = _np.deg2rad(lonsdeg)
+    colat = _np.deg2rad(90-latsdeg)
+    PHI, THETA = _np.meshgrid(lon, colat)
+    R = _np.ones_like(PHI)
+    X,Y,Z = SphCoord_to_CartCoord(R, THETA, PHI)
+    return _np.stack([X,Y,Z], axis=-1)
+
 # Routines to calculate index for translating between cilm and vector
 def lm2L(l, m):
     """translate 2d indices (l, m) to 1d index L"""

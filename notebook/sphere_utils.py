@@ -243,3 +243,29 @@ def grad_usurf2dr(u_surf, f_interp, lmax, beta=1, norm_order=1,
         raise TypeError('JacMat must be provided')
     JacMat = JacMat[0] + beta*JacMat[1]
     return np.ravel(np.dot(JacMat.dot(umesh).real, dum_dus))
+
+def usurf2dr2(u_surf, f_interp, lmax, beta=1, norm_order=1, 
+             X0surf=None, X0=None, isTfv=None, Cmat=None, Dmat=None, 
+             mu0=300/3, nu0=0.499, lat_weights=np.array([1]), vert_weight=np.array([1]),
+             eps=1e-5, mode='forward', JacMat=None, gamma=1):
+    Uvec, aK, Tvec = usurf2vec(u_surf, f_interp, lmax, Cmat=Cmat, Dmat=Dmat, mu0=mu0, nu0=nu0)
+    Tdist = Tvec2Tres(Tvec, lmax, isTfv=isTfv, lat_weights=lat_weights, vert_weight=vert_weight, norm_order=norm_order)
+    Eel = np.vdot(Uvec, Tvec).real*2*np.pi
+    ldamp_hi = lmax; ldamp_lo = lmax - 5;
+    lv, _ = LM_list(lmax); lv_ones = np.ones_like(lv);
+    lv_lim = np.minimum(np.maximum(lv, ldamp_lo), ldamp_hi)
+    ldamp = (np.maximum(lv_lim-ldamp_lo, 0) / (ldamp_hi - ldamp_lo))**1
+    Tvec_mod = (Tvec.reshape(3, -1) * ldamp).flatten()
+    penalty = np.vdot(Tvec_mod, Tvec_mod).real
+    return Tdist + beta * Eel + gamma * penalty
+
+def grad_usurf2dr2(u_surf, f_interp, lmax, beta=1, norm_order=1, 
+                  X0surf=None, X0=None, isTfv=None, Cmat=None, Dmat=None, 
+                  mu0=300/3, nu0=0.499, lat_weights=np.array([1]), vert_weight=np.array([1]), 
+                  eps=1e-5, mode='forward', JacMat=None, gamma=1):
+    umesh = usurf2umesh(u_surf, f_interp, lmax, X0surf=X0surf, X0=X0)
+    dum_dus = dumesh_dus(u_surf, f_interp, lmax, X0surf, X0, eps=eps, mode='forward')
+    if JacMat is None:
+        raise TypeError('JacMat must be provided')
+    JacMat = JacMat[0] + beta*JacMat[1] + gamma*JacMat[2]
+    return np.ravel(np.dot(JacMat.dot(umesh).real, dum_dus))

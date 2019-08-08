@@ -8,6 +8,7 @@ import numpy as _np
 import scipy.sparse as _spm
 import matplotlib.pyplot as _plt
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
 import pyshtools as _psh
 from shelastic.shutil import SHVec2mesh
 
@@ -174,7 +175,7 @@ def visSHVec(xvec, lmax_plot=None, cmap='viridis', show=True,
     return fig, ax
 
 def visSH3d(xmesh, cmesh=None, r0=1, lmax_plot=None,
-            figsize=(16,16), show=True, filename=None,
+            figsize=(16,16), show=True, filename=None, vmin=None, vmax=None,
             elevation=0, azimuth=0, surface=False, color=None):
     """Plot reconstructed spherical shape and traction colored 3d plot
 
@@ -246,7 +247,11 @@ def visSH3d(xmesh, cmesh=None, r0=1, lmax_plot=None,
                              magn_point[1:, :-1] + magn_point[:-1, :-1])
         magnmax_face = _np.max(_np.abs(magn_face))
         magnmax_point = _np.max(_np.abs(magn_point))
-        norm = _plt.Normalize(-magnmax_face / 2., magnmax_face / 2., clip=True)
+        if vmin is None:
+            vmin = -magnmax_face/2.
+        if vmax is None:
+            vmax =  magnmax_face/2.
+        norm = _plt.Normalize(vmin, vmax, clip=True)
         cmap = _plt.get_cmap('RdBu_r')
         colors = cmap(norm(magn_face.flatten()))
         colors = colors.reshape(nlat + 1, nlon, 4)
@@ -255,9 +260,10 @@ def visSH3d(xmesh, cmesh=None, r0=1, lmax_plot=None,
     ax3d = fig.add_subplot(1, 1, 1, projection='3d')
     if surface:
         if color is None:
-            ax3d.plot_surface(x, y, z, rstride=1, cstride=1, facecolors=colors)
+            surf = ax3d.plot_surface(x, y, z, rstride=1, cstride=1, facecolors=colors)
         else:
-            ax3d.plot_surface(x, y, z, rstride=1, cstride=1, color=color)
+            surf = ax3d.plot_surface(x, y, z, rstride=1, cstride=1, color=color)
+        fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax3d, shrink=0.6)
     else:
         ax3d.scatter(x, y, z)
     ax3d.view_init(elev=elevation, azim=azimuth)

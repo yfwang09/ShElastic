@@ -1,0 +1,1024 @@
+Integrating modes to a matrix
+1323 1323
+Integrating modes to a matrix
+1323 1323
+data, connectivity: (8136, 3) (16268, 3)
+id of nodes, edges, facets: (8136,) (24402, 2) (16268, 3)
+coord of nodes, edges, facets: (8136, 3) (24402, 2, 3) (16268, 3, 3)
+V = 607.1011, r0 = 5.2528
+shape fitting accuracy: 0.0010600302384497387
+['AK_Shape2_b0e+00_lmax20smoothed_3_1um_dilated_g0e+00_00.npz', 'AK_Shape2_b0e+00_lmax20smoothed_3_1um_dilated_g0e+00_01.npz']
+Integrating modes to a matrix
+1323 1323
+Integrating modes to a matrix
+1323 1323
+(21, 41)
+Time for generating L matrix: 44.94s
+Time for generating S matrix: 6.17s
+Time for generating S^HCD^{-1}S matrix: 38.22s
+Time for generating QCDSHQCDS matrix: 21.03s
+time of matrix build: 19.680363178253174
+Traction residual: 1.3378e+01 Pa
+Elastic energy: 6.5174e-04 pJ
+funval: 1.7898e-02 4.4968e-02 3.3443e-03
+Period    0  Tr            Eel           f0           f1           f2           f
+   1.3376e+01Pa   6.5173e-04pJ   1.7891e-02   4.4967e-02   3.3428e-03   4.4967e-02
+   1.3365e+01Pa   6.5172e-04pJ   1.7862e-02   4.4966e-02   3.3381e-03   4.4966e-02
+   1.3364e+01Pa   6.5171e-04pJ   1.7859e-02   4.4966e-02   3.3381e-03   4.4966e-02
+   1.3369e+01Pa   6.5171e-04pJ   1.7874e-02   4.4965e-02   3.3379e-03   4.4965e-02
+   1.3377e+01Pa   6.5169e-04pJ   1.7894e-02   4.4965e-02   3.3378e-03   4.4965e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044965
+         Iterations: 5
+         Function evaluations: 27
+         Gradient evaluations: 27
+Iteration Time: 21.22s
+Period    1  Tr            Eel           f0           f1           f2           f
+   1.3376e+01Pa   6.5169e-04pJ   1.7892e-02   4.4964e-02   3.3382e-03   4.4964e-02
+   1.3377e+01Pa   6.5169e-04pJ   1.7893e-02   4.4964e-02   3.3383e-03   4.4964e-02
+   1.3389e+01Pa   6.5169e-04pJ   1.7927e-02   4.4964e-02   3.3388e-03   4.4964e-02
+   1.3473e+01Pa   6.5167e-04pJ   1.8153e-02   4.4963e-02   3.3412e-03   4.4963e-02
+   1.3491e+01Pa   6.5165e-04pJ   1.8200e-02   4.4962e-02   3.3448e-03   4.4962e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044962
+         Iterations: 5
+         Function evaluations: 32
+         Gradient evaluations: 32
+Iteration Time: 14.19s
+Period    2  Tr            Eel           f0           f1           f2           f
+   1.3436e+01Pa   6.5163e-04pJ   1.8054e-02   4.4960e-02   3.3424e-03   4.4960e-02
+   1.3391e+01Pa   6.5161e-04pJ   1.7932e-02   4.4959e-02   3.3439e-03   4.4959e-02
+   1.3368e+01Pa   6.5159e-04pJ   1.7869e-02   4.4957e-02   3.3459e-03   4.4957e-02
+   1.3368e+01Pa   6.5159e-04pJ   1.7869e-02   4.4957e-02   3.3460e-03   4.4957e-02
+   1.3369e+01Pa   6.5158e-04pJ   1.7874e-02   4.4957e-02   3.3461e-03   4.4957e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044957
+         Iterations: 5
+         Function evaluations: 42
+         Gradient evaluations: 42
+Iteration Time: 18.80s
+Period    3  Tr            Eel           f0           f1           f2           f
+   1.3370e+01Pa   6.5158e-04pJ   1.7875e-02   4.4957e-02   3.3461e-03   4.4957e-02
+   1.3381e+01Pa   6.5158e-04pJ   1.7904e-02   4.4957e-02   3.3447e-03   4.4957e-02
+   1.3403e+01Pa   6.5157e-04pJ   1.7965e-02   4.4956e-02   3.3435e-03   4.4956e-02
+   1.3433e+01Pa   6.5157e-04pJ   1.8045e-02   4.4956e-02   3.3418e-03   4.4956e-02
+   1.3544e+01Pa   6.5153e-04pJ   1.8343e-02   4.4953e-02   3.3388e-03   4.4953e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044953
+         Iterations: 5
+         Function evaluations: 27
+         Gradient evaluations: 27
+Iteration Time: 12.29s
+Period    4  Tr            Eel           f0           f1           f2           f
+   1.3522e+01Pa   6.5152e-04pJ   1.8283e-02   4.4952e-02   3.3390e-03   4.4952e-02
+   1.3424e+01Pa   6.5149e-04pJ   1.8019e-02   4.4951e-02   3.3437e-03   4.4951e-02
+   1.3419e+01Pa   6.5149e-04pJ   1.8008e-02   4.4951e-02   3.3441e-03   4.4951e-02
+   1.3405e+01Pa   6.5148e-04pJ   1.7970e-02   4.4950e-02   3.3466e-03   4.4950e-02
+   1.3399e+01Pa   6.5148e-04pJ   1.7952e-02   4.4950e-02   3.3489e-03   4.4950e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044950
+         Iterations: 5
+         Function evaluations: 26
+         Gradient evaluations: 26
+Iteration Time: 12.01s
+Period    5  Tr            Eel           f0           f1           f2           f
+   1.3401e+01Pa   6.5148e-04pJ   1.7960e-02   4.4950e-02   3.3483e-03   4.4950e-02
+   1.3404e+01Pa   6.5147e-04pJ   1.7966e-02   4.4949e-02   3.3477e-03   4.4949e-02
+   1.3404e+01Pa   6.5147e-04pJ   1.7967e-02   4.4949e-02   3.3476e-03   4.4949e-02
+   1.3406e+01Pa   6.5146e-04pJ   1.7971e-02   4.4949e-02   3.3479e-03   4.4949e-02
+   1.3409e+01Pa   6.5146e-04pJ   1.7981e-02   4.4949e-02   3.3480e-03   4.4949e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044949
+         Iterations: 5
+         Function evaluations: 29
+         Gradient evaluations: 29
+Iteration Time: 13.35s
+Period    6  Tr            Eel           f0           f1           f2           f
+   1.3409e+01Pa   6.5146e-04pJ   1.7980e-02   4.4948e-02   3.3480e-03   4.4948e-02
+   1.3410e+01Pa   6.5146e-04pJ   1.7982e-02   4.4948e-02   3.3483e-03   4.4948e-02
+   1.3409e+01Pa   6.5146e-04pJ   1.7980e-02   4.4948e-02   3.3486e-03   4.4948e-02
+   1.3411e+01Pa   6.5145e-04pJ   1.7986e-02   4.4948e-02   3.3496e-03   4.4948e-02
+   1.3413e+01Pa   6.5145e-04pJ   1.7990e-02   4.4948e-02   3.3497e-03   4.4948e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044948
+         Iterations: 5
+         Function evaluations: 22
+         Gradient evaluations: 22
+Iteration Time: 11.07s
+Period    7  Tr            Eel           f0           f1           f2           f
+   1.3412e+01Pa   6.5145e-04pJ   1.7988e-02   4.4948e-02   3.3499e-03   4.4948e-02
+   1.3412e+01Pa   6.5145e-04pJ   1.7989e-02   4.4948e-02   3.3499e-03   4.4948e-02
+   1.3414e+01Pa   6.5145e-04pJ   1.7993e-02   4.4948e-02   3.3494e-03   4.4948e-02
+   1.3415e+01Pa   6.5144e-04pJ   1.7996e-02   4.4947e-02   3.3495e-03   4.4947e-02
+   1.3415e+01Pa   6.5144e-04pJ   1.7997e-02   4.4947e-02   3.3495e-03   4.4947e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044947
+         Iterations: 5
+         Function evaluations: 22
+         Gradient evaluations: 22
+Iteration Time: 10.21s
+Period    8  Tr            Eel           f0           f1           f2           f
+   1.3415e+01Pa   6.5144e-04pJ   1.7995e-02   4.4947e-02   3.3496e-03   4.4947e-02
+   1.3416e+01Pa   6.5144e-04pJ   1.7998e-02   4.4947e-02   3.3501e-03   4.4947e-02
+Warning: Desired error not necessarily achieved due to precision loss.
+         Current function value: 0.044947
+         Iterations: 2
+         Function evaluations: 102
+         Gradient evaluations: 90
+Iteration Time: 42.71s
+Period    9  Tr            Eel           f0           f1           f2           f
+   1.3416e+01Pa   6.5144e-04pJ   1.7998e-02   4.4947e-02   3.3501e-03   4.4947e-02
+   1.3415e+01Pa   6.5144e-04pJ   1.7996e-02   4.4947e-02   3.3501e-03   4.4947e-02
+   1.3414e+01Pa   6.5144e-04pJ   1.7994e-02   4.4947e-02   3.3501e-03   4.4947e-02
+   1.3414e+01Pa   6.5144e-04pJ   1.7994e-02   4.4947e-02   3.3501e-03   4.4947e-02
+   1.3414e+01Pa   6.5144e-04pJ   1.7994e-02   4.4947e-02   3.3501e-03   4.4947e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044947
+         Iterations: 5
+         Function evaluations: 22
+         Gradient evaluations: 22
+Iteration Time: 10.91s
+update isTfv at step 9
+Period   10  Tr            Eel           f0           f1           f2           f
+   1.3415e+01Pa   6.5144e-04pJ   1.7995e-02   4.4947e-02   3.3502e-03   4.4947e-02
+   1.3417e+01Pa   6.5144e-04pJ   1.8003e-02   4.4947e-02   3.3503e-03   4.4947e-02
+   1.3419e+01Pa   6.5143e-04pJ   1.8006e-02   4.4947e-02   3.3502e-03   4.4947e-02
+   1.3426e+01Pa   6.5143e-04pJ   1.8026e-02   4.4946e-02   3.3511e-03   4.4946e-02
+   1.3471e+01Pa   6.5140e-04pJ   1.8147e-02   4.4944e-02   3.3549e-03   4.4944e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044944
+         Iterations: 5
+         Function evaluations: 25
+         Gradient evaluations: 25
+Iteration Time: 11.70s
+Period   11  Tr            Eel           f0           f1           f2           f
+   1.3455e+01Pa   6.5139e-04pJ   1.8103e-02   4.4944e-02   3.3536e-03   4.4944e-02
+   1.3393e+01Pa   6.5137e-04pJ   1.7939e-02   4.4942e-02   3.3507e-03   4.4942e-02
+   1.3388e+01Pa   6.5137e-04pJ   1.7925e-02   4.4942e-02   3.3506e-03   4.4942e-02
+   1.3374e+01Pa   6.5136e-04pJ   1.7886e-02   4.4942e-02   3.3502e-03   4.4942e-02
+   1.3377e+01Pa   6.5136e-04pJ   1.7895e-02   4.4942e-02   3.3496e-03   4.4942e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044942
+         Iterations: 5
+         Function evaluations: 28
+         Gradient evaluations: 28
+Iteration Time: 12.26s
+Period   12  Tr            Eel           f0           f1           f2           f
+   1.3381e+01Pa   6.5135e-04pJ   1.7904e-02   4.4941e-02   3.3512e-03   4.4941e-02
+   1.3394e+01Pa   6.5135e-04pJ   1.7939e-02   4.4941e-02   3.3533e-03   4.4941e-02
+   1.3398e+01Pa   6.5135e-04pJ   1.7949e-02   4.4941e-02   3.3537e-03   4.4941e-02
+   1.3418e+01Pa   6.5134e-04pJ   1.8003e-02   4.4940e-02   3.3545e-03   4.4940e-02
+   1.3434e+01Pa   6.5132e-04pJ   1.8048e-02   4.4939e-02   3.3568e-03   4.4939e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044939
+         Iterations: 5
+         Function evaluations: 29
+         Gradient evaluations: 29
+Iteration Time: 13.11s
+Period   13  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5132e-04pJ   1.8022e-02   4.4939e-02   3.3558e-03   4.4939e-02
+   1.3387e+01Pa   6.5130e-04pJ   1.7921e-02   4.4937e-02   3.3546e-03   4.4937e-02
+   1.3380e+01Pa   6.5129e-04pJ   1.7904e-02   4.4937e-02   3.3549e-03   4.4937e-02
+   1.3369e+01Pa   6.5129e-04pJ   1.7873e-02   4.4937e-02   3.3551e-03   4.4937e-02
+   1.3366e+01Pa   6.5128e-04pJ   1.7865e-02   4.4936e-02   3.3541e-03   4.4936e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044936
+         Iterations: 5
+         Function evaluations: 28
+         Gradient evaluations: 28
+Iteration Time: 12.51s
+Period   14  Tr            Eel           f0           f1           f2           f
+   1.3366e+01Pa   6.5127e-04pJ   1.7865e-02   4.4936e-02   3.3541e-03   4.4936e-02
+   1.3377e+01Pa   6.5127e-04pJ   1.7895e-02   4.4936e-02   3.3535e-03   4.4936e-02
+   1.3388e+01Pa   6.5126e-04pJ   1.7924e-02   4.4935e-02   3.3522e-03   4.4935e-02
+   1.3406e+01Pa   6.5126e-04pJ   1.7972e-02   4.4934e-02   3.3524e-03   4.4934e-02
+   1.3464e+01Pa   6.5125e-04pJ   1.8128e-02   4.4934e-02   3.3521e-03   4.4934e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044934
+         Iterations: 5
+         Function evaluations: 27
+         Gradient evaluations: 27
+Iteration Time: 12.19s
+Period   15  Tr            Eel           f0           f1           f2           f
+   1.3425e+01Pa   6.5121e-04pJ   1.8023e-02   4.4931e-02   3.3578e-03   4.4931e-02
+   1.3389e+01Pa   6.5120e-04pJ   1.7927e-02   4.4931e-02   3.3620e-03   4.4931e-02
+   1.3355e+01Pa   6.5119e-04pJ   1.7836e-02   4.4930e-02   3.3646e-03   4.4930e-02
+   1.3340e+01Pa   6.5118e-04pJ   1.7796e-02   4.4929e-02   3.3655e-03   4.4929e-02
+   1.3365e+01Pa   6.5116e-04pJ   1.7863e-02   4.4928e-02   3.3640e-03   4.4928e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044928
+         Iterations: 5
+         Function evaluations: 32
+         Gradient evaluations: 32
+Iteration Time: 14.14s
+Period   16  Tr            Eel           f0           f1           f2           f
+   1.3386e+01Pa   6.5113e-04pJ   1.7917e-02   4.4925e-02   3.3624e-03   4.4925e-02
+   1.3424e+01Pa   6.5109e-04pJ   1.8020e-02   4.4923e-02   3.3642e-03   4.4923e-02
+   1.3410e+01Pa   6.5107e-04pJ   1.7983e-02   4.4921e-02   3.3666e-03   4.4921e-02
+   1.3401e+01Pa   6.5106e-04pJ   1.7959e-02   4.4921e-02   3.3681e-03   4.4921e-02
+   1.3394e+01Pa   6.5104e-04pJ   1.7940e-02   4.4920e-02   3.3675e-03   4.4920e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044920
+         Iterations: 5
+         Function evaluations: 32
+         Gradient evaluations: 32
+Iteration Time: 14.57s
+Period   17  Tr            Eel           f0           f1           f2           f
+   1.3394e+01Pa   6.5104e-04pJ   1.7940e-02   4.4920e-02   3.3677e-03   4.4920e-02
+   1.3395e+01Pa   6.5104e-04pJ   1.7942e-02   4.4919e-02   3.3683e-03   4.4919e-02
+   1.3395e+01Pa   6.5103e-04pJ   1.7941e-02   4.4919e-02   3.3690e-03   4.4919e-02
+   1.3396e+01Pa   6.5103e-04pJ   1.7946e-02   4.4919e-02   3.3705e-03   4.4919e-02
+   1.3399e+01Pa   6.5102e-04pJ   1.7953e-02   4.4918e-02   3.3704e-03   4.4918e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044918
+         Iterations: 5
+         Function evaluations: 25
+         Gradient evaluations: 25
+Iteration Time: 12.08s
+Period   18  Tr            Eel           f0           f1           f2           f
+   1.3400e+01Pa   6.5102e-04pJ   1.7957e-02   4.4918e-02   3.3686e-03   4.4918e-02
+   1.3398e+01Pa   6.5100e-04pJ   1.7952e-02   4.4917e-02   3.3652e-03   4.4917e-02
+   1.3421e+01Pa   6.5100e-04pJ   1.8012e-02   4.4916e-02   3.3658e-03   4.4916e-02
+   1.3422e+01Pa   6.5099e-04pJ   1.8016e-02   4.4916e-02   3.3660e-03   4.4916e-02
+   1.3473e+01Pa   6.5095e-04pJ   1.8152e-02   4.4913e-02   3.3852e-03   4.4913e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044913
+         Iterations: 5
+         Function evaluations: 30
+         Gradient evaluations: 30
+Iteration Time: 13.36s
+Period   19  Tr            Eel           f0           f1           f2           f
+   1.3419e+01Pa   6.5091e-04pJ   1.8006e-02   4.4911e-02   3.3788e-03   4.4911e-02
+   1.3283e+01Pa   6.5089e-04pJ   1.7645e-02   4.4909e-02   3.3713e-03   4.4909e-02
+   1.3287e+01Pa   6.5088e-04pJ   1.7655e-02   4.4908e-02   3.3724e-03   4.4908e-02
+   1.3364e+01Pa   6.5083e-04pJ   1.7860e-02   4.4905e-02   3.3770e-03   4.4905e-02
+   1.3419e+01Pa   6.5080e-04pJ   1.8006e-02   4.4903e-02   3.3842e-03   4.4903e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044903
+         Iterations: 5
+         Function evaluations: 33
+         Gradient evaluations: 33
+Iteration Time: 14.47s
+update isTfv at step 19
+Period   20  Tr            Eel           f0           f1           f2           f
+   1.3415e+01Pa   6.5079e-04pJ   1.7997e-02   4.4902e-02   3.3841e-03   4.4902e-02
+   1.3396e+01Pa   6.5077e-04pJ   1.7947e-02   4.4901e-02   3.3884e-03   4.4901e-02
+   1.3397e+01Pa   6.5077e-04pJ   1.7948e-02   4.4901e-02   3.3887e-03   4.4901e-02
+   1.3404e+01Pa   6.5075e-04pJ   1.7966e-02   4.4900e-02   3.3905e-03   4.4900e-02
+   1.3408e+01Pa   6.5075e-04pJ   1.7977e-02   4.4900e-02   3.3919e-03   4.4900e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044900
+         Iterations: 5
+         Function evaluations: 28
+         Gradient evaluations: 28
+Iteration Time: 12.62s
+Period   21  Tr            Eel           f0           f1           f2           f
+   1.3407e+01Pa   6.5075e-04pJ   1.7974e-02   4.4899e-02   3.3917e-03   4.4899e-02
+   1.3390e+01Pa   6.5074e-04pJ   1.7929e-02   4.4899e-02   3.3912e-03   4.4899e-02
+   1.3388e+01Pa   6.5073e-04pJ   1.7925e-02   4.4898e-02   3.3915e-03   4.4898e-02
+   1.3389e+01Pa   6.5073e-04pJ   1.7927e-02   4.4898e-02   3.3915e-03   4.4898e-02
+   1.3391e+01Pa   6.5073e-04pJ   1.7933e-02   4.4898e-02   3.3913e-03   4.4898e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044898
+         Iterations: 5
+         Function evaluations: 25
+         Gradient evaluations: 25
+Iteration Time: 11.53s
+Period   22  Tr            Eel           f0           f1           f2           f
+   1.3394e+01Pa   6.5073e-04pJ   1.7939e-02   4.4898e-02   3.3907e-03   4.4898e-02
+   1.3398e+01Pa   6.5072e-04pJ   1.7951e-02   4.4898e-02   3.3913e-03   4.4898e-02
+   1.3393e+01Pa   6.5071e-04pJ   1.7937e-02   4.4897e-02   3.3923e-03   4.4897e-02
+   1.3395e+01Pa   6.5071e-04pJ   1.7943e-02   4.4897e-02   3.3921e-03   4.4897e-02
+   1.3402e+01Pa   6.5070e-04pJ   1.7962e-02   4.4896e-02   3.3916e-03   4.4896e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044896
+         Iterations: 5
+         Function evaluations: 35
+         Gradient evaluations: 35
+Iteration Time: 15.89s
+Period   23  Tr            Eel           f0           f1           f2           f
+   1.3397e+01Pa   6.5070e-04pJ   1.7949e-02   4.4896e-02   3.3919e-03   4.4896e-02
+   1.3395e+01Pa   6.5069e-04pJ   1.7943e-02   4.4896e-02   3.3923e-03   4.4896e-02
+   1.3395e+01Pa   6.5069e-04pJ   1.7943e-02   4.4896e-02   3.3923e-03   4.4896e-02
+   1.3398e+01Pa   6.5069e-04pJ   1.7950e-02   4.4895e-02   3.3924e-03   4.4895e-02
+   1.3402e+01Pa   6.5068e-04pJ   1.7961e-02   4.4895e-02   3.3924e-03   4.4895e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044895
+         Iterations: 5
+         Function evaluations: 34
+         Gradient evaluations: 34
+Iteration Time: 15.12s
+Period   24  Tr            Eel           f0           f1           f2           f
+   1.3401e+01Pa   6.5068e-04pJ   1.7958e-02   4.4895e-02   3.3926e-03   4.4895e-02
+   1.3403e+01Pa   6.5068e-04pJ   1.7964e-02   4.4895e-02   3.3928e-03   4.4895e-02
+   1.3404e+01Pa   6.5068e-04pJ   1.7967e-02   4.4895e-02   3.3927e-03   4.4895e-02
+   1.3409e+01Pa   6.5067e-04pJ   1.7980e-02   4.4894e-02   3.3934e-03   4.4894e-02
+   1.3410e+01Pa   6.5067e-04pJ   1.7982e-02   4.4894e-02   3.3935e-03   4.4894e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044894
+         Iterations: 5
+         Function evaluations: 26
+         Gradient evaluations: 26
+Iteration Time: 11.88s
+Period   25  Tr            Eel           f0           f1           f2           f
+   1.3409e+01Pa   6.5067e-04pJ   1.7981e-02   4.4894e-02   3.3934e-03   4.4894e-02
+   1.3405e+01Pa   6.5067e-04pJ   1.7969e-02   4.4894e-02   3.3936e-03   4.4894e-02
+   1.3407e+01Pa   6.5066e-04pJ   1.7974e-02   4.4893e-02   3.3938e-03   4.4893e-02
+   1.3411e+01Pa   6.5066e-04pJ   1.7986e-02   4.4893e-02   3.3946e-03   4.4893e-02
+   1.3421e+01Pa   6.5066e-04pJ   1.8012e-02   4.4893e-02   3.3955e-03   4.4893e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044893
+         Iterations: 5
+         Function evaluations: 26
+         Gradient evaluations: 26
+Iteration Time: 12.61s
+Period   26  Tr            Eel           f0           f1           f2           f
+   1.3422e+01Pa   6.5065e-04pJ   1.8015e-02   4.4893e-02   3.3943e-03   4.4893e-02
+   1.3414e+01Pa   6.5064e-04pJ   1.7995e-02   4.4892e-02   3.3934e-03   4.4892e-02
+   1.3412e+01Pa   6.5064e-04pJ   1.7987e-02   4.4892e-02   3.3936e-03   4.4892e-02
+   1.3412e+01Pa   6.5063e-04pJ   1.7989e-02   4.4891e-02   3.3935e-03   4.4891e-02
+   1.3412e+01Pa   6.5063e-04pJ   1.7988e-02   4.4891e-02   3.3933e-03   4.4891e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044891
+         Iterations: 5
+         Function evaluations: 26
+         Gradient evaluations: 26
+Iteration Time: 12.93s
+Period   27  Tr            Eel           f0           f1           f2           f
+   1.3411e+01Pa   6.5063e-04pJ   1.7985e-02   4.4891e-02   3.3934e-03   4.4891e-02
+   1.3410e+01Pa   6.5063e-04pJ   1.7984e-02   4.4891e-02   3.3937e-03   4.4891e-02
+   1.3412e+01Pa   6.5062e-04pJ   1.7987e-02   4.4891e-02   3.3937e-03   4.4891e-02
+   1.3412e+01Pa   6.5062e-04pJ   1.7989e-02   4.4891e-02   3.3938e-03   4.4891e-02
+   1.3412e+01Pa   6.5062e-04pJ   1.7987e-02   4.4891e-02   3.3939e-03   4.4891e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044891
+         Iterations: 5
+         Function evaluations: 22
+         Gradient evaluations: 22
+Iteration Time: 10.63s
+Period   28  Tr            Eel           f0           f1           f2           f
+   1.3412e+01Pa   6.5062e-04pJ   1.7987e-02   4.4891e-02   3.3939e-03   4.4891e-02
+   1.3410e+01Pa   6.5062e-04pJ   1.7984e-02   4.4891e-02   3.3936e-03   4.4891e-02
+   1.3411e+01Pa   6.5062e-04pJ   1.7985e-02   4.4890e-02   3.3937e-03   4.4890e-02
+   1.3412e+01Pa   6.5062e-04pJ   1.7989e-02   4.4890e-02   3.3939e-03   4.4890e-02
+   1.3415e+01Pa   6.5061e-04pJ   1.7995e-02   4.4890e-02   3.3942e-03   4.4890e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044890
+         Iterations: 5
+         Function evaluations: 21
+         Gradient evaluations: 21
+Iteration Time: 10.59s
+Period   29  Tr            Eel           f0           f1           f2           f
+   1.3414e+01Pa   6.5061e-04pJ   1.7994e-02   4.4890e-02   3.3942e-03   4.4890e-02
+   1.3411e+01Pa   6.5061e-04pJ   1.7987e-02   4.4890e-02   3.3945e-03   4.4890e-02
+   1.3411e+01Pa   6.5061e-04pJ   1.7986e-02   4.4890e-02   3.3946e-03   4.4890e-02
+   1.3412e+01Pa   6.5061e-04pJ   1.7987e-02   4.4890e-02   3.3948e-03   4.4890e-02
+   1.3413e+01Pa   6.5061e-04pJ   1.7990e-02   4.4890e-02   3.3952e-03   4.4890e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044890
+         Iterations: 5
+         Function evaluations: 19
+         Gradient evaluations: 19
+Iteration Time: 9.19s
+update isTfv at step 29
+Period   30  Tr            Eel           f0           f1           f2           f
+   1.3412e+01Pa   6.5061e-04pJ   1.7989e-02   4.4890e-02   3.3952e-03   4.4890e-02
+   1.3410e+01Pa   6.5061e-04pJ   1.7983e-02   4.4890e-02   3.3951e-03   4.4890e-02
+   1.3410e+01Pa   6.5060e-04pJ   1.7982e-02   4.4889e-02   3.3952e-03   4.4889e-02
+   1.3410e+01Pa   6.5060e-04pJ   1.7983e-02   4.4889e-02   3.3953e-03   4.4889e-02
+   1.3411e+01Pa   6.5060e-04pJ   1.7986e-02   4.4889e-02   3.3955e-03   4.4889e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044889
+         Iterations: 5
+         Function evaluations: 21
+         Gradient evaluations: 21
+Iteration Time: 10.26s
+Period   31  Tr            Eel           f0           f1           f2           f
+   1.3411e+01Pa   6.5060e-04pJ   1.7985e-02   4.4889e-02   3.3955e-03   4.4889e-02
+   1.3411e+01Pa   6.5060e-04pJ   1.7985e-02   4.4889e-02   3.3957e-03   4.4889e-02
+   1.3411e+01Pa   6.5060e-04pJ   1.7986e-02   4.4889e-02   3.3959e-03   4.4889e-02
+   1.3413e+01Pa   6.5060e-04pJ   1.7991e-02   4.4889e-02   3.3962e-03   4.4889e-02
+   1.3416e+01Pa   6.5059e-04pJ   1.7998e-02   4.4889e-02   3.3970e-03   4.4889e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044889
+         Iterations: 5
+         Function evaluations: 22
+         Gradient evaluations: 22
+Iteration Time: 11.70s
+Period   32  Tr            Eel           f0           f1           f2           f
+   1.3416e+01Pa   6.5059e-04pJ   1.7998e-02   4.4889e-02   3.3969e-03   4.4889e-02
+   1.3418e+01Pa   6.5059e-04pJ   1.8005e-02   4.4888e-02   3.3975e-03   4.4888e-02
+   1.3419e+01Pa   6.5059e-04pJ   1.8007e-02   4.4888e-02   3.3977e-03   4.4888e-02
+   1.3422e+01Pa   6.5058e-04pJ   1.8015e-02   4.4888e-02   3.3980e-03   4.4888e-02
+   1.3438e+01Pa   6.5058e-04pJ   1.8058e-02   4.4888e-02   3.3990e-03   4.4888e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044888
+         Iterations: 5
+         Function evaluations: 26
+         Gradient evaluations: 26
+Iteration Time: 12.99s
+Period   33  Tr            Eel           f0           f1           f2           f
+   1.3437e+01Pa   6.5058e-04pJ   1.8057e-02   4.4888e-02   3.3989e-03   4.4888e-02
+   1.3433e+01Pa   6.5057e-04pJ   1.8044e-02   4.4887e-02   3.3988e-03   4.4887e-02
+   1.3433e+01Pa   6.5057e-04pJ   1.8044e-02   4.4887e-02   3.3987e-03   4.4887e-02
+   1.3426e+01Pa   6.5057e-04pJ   1.8025e-02   4.4887e-02   3.3980e-03   4.4887e-02
+   1.3423e+01Pa   6.5057e-04pJ   1.8017e-02   4.4887e-02   3.3975e-03   4.4887e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044887
+         Iterations: 5
+         Function evaluations: 21
+         Gradient evaluations: 21
+Iteration Time: 10.28s
+Period   34  Tr            Eel           f0           f1           f2           f
+   1.3423e+01Pa   6.5057e-04pJ   1.8017e-02   4.4887e-02   3.3975e-03   4.4887e-02
+   1.3422e+01Pa   6.5057e-04pJ   1.8015e-02   4.4887e-02   3.3973e-03   4.4887e-02
+   1.3422e+01Pa   6.5057e-04pJ   1.8015e-02   4.4887e-02   3.3974e-03   4.4887e-02
+   1.3422e+01Pa   6.5056e-04pJ   1.8014e-02   4.4887e-02   3.3974e-03   4.4887e-02
+   1.3419e+01Pa   6.5056e-04pJ   1.8008e-02   4.4887e-02   3.3980e-03   4.4887e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044887
+         Iterations: 5
+         Function evaluations: 21
+         Gradient evaluations: 21
+Iteration Time: 10.22s
+Period   35  Tr            Eel           f0           f1           f2           f
+   1.3419e+01Pa   6.5056e-04pJ   1.8008e-02   4.4886e-02   3.3977e-03   4.4886e-02
+   1.3421e+01Pa   6.5056e-04pJ   1.8013e-02   4.4886e-02   3.3972e-03   4.4886e-02
+   1.3421e+01Pa   6.5056e-04pJ   1.8012e-02   4.4886e-02   3.3974e-03   4.4886e-02
+   1.3423e+01Pa   6.5055e-04pJ   1.8018e-02   4.4886e-02   3.3978e-03   4.4886e-02
+   1.3423e+01Pa   6.5055e-04pJ   1.8018e-02   4.4886e-02   3.3978e-03   4.4886e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044886
+         Iterations: 5
+         Function evaluations: 21
+         Gradient evaluations: 21
+Iteration Time: 10.75s
+Period   36  Tr            Eel           f0           f1           f2           f
+   1.3422e+01Pa   6.5055e-04pJ   1.8015e-02   4.4886e-02   3.3979e-03   4.4886e-02
+   1.3418e+01Pa   6.5055e-04pJ   1.8005e-02   4.4886e-02   3.3981e-03   4.4886e-02
+   1.3417e+01Pa   6.5055e-04pJ   1.8003e-02   4.4886e-02   3.3981e-03   4.4886e-02
+   1.3416e+01Pa   6.5055e-04pJ   1.7998e-02   4.4885e-02   3.3982e-03   4.4885e-02
+   1.3415e+01Pa   6.5054e-04pJ   1.7997e-02   4.4885e-02   3.3982e-03   4.4885e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044885
+         Iterations: 5
+         Function evaluations: 23
+         Gradient evaluations: 23
+Iteration Time: 11.05s
+Period   37  Tr            Eel           f0           f1           f2           f
+   1.3414e+01Pa   6.5054e-04pJ   1.7993e-02   4.4885e-02   3.3981e-03   4.4885e-02
+   1.3414e+01Pa   6.5054e-04pJ   1.7993e-02   4.4885e-02   3.3980e-03   4.4885e-02
+   1.3416e+01Pa   6.5054e-04pJ   1.8000e-02   4.4885e-02   3.3979e-03   4.4885e-02
+   1.3424e+01Pa   6.5054e-04pJ   1.8021e-02   4.4885e-02   3.3973e-03   4.4885e-02
+   1.3424e+01Pa   6.5054e-04pJ   1.8021e-02   4.4885e-02   3.3973e-03   4.4885e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044885
+         Iterations: 5
+         Function evaluations: 23
+         Gradient evaluations: 23
+Iteration Time: 11.08s
+Period   38  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5054e-04pJ   1.8021e-02   4.4885e-02   3.3973e-03   4.4885e-02
+   1.3416e+01Pa   6.5053e-04pJ   1.7998e-02   4.4885e-02   3.3972e-03   4.4885e-02
+   1.3411e+01Pa   6.5053e-04pJ   1.7985e-02   4.4885e-02   3.3969e-03   4.4885e-02
+   1.3410e+01Pa   6.5053e-04pJ   1.7983e-02   4.4884e-02   3.3969e-03   4.4884e-02
+   1.3408e+01Pa   6.5053e-04pJ   1.7978e-02   4.4884e-02   3.3978e-03   4.4884e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044884
+         Iterations: 5
+         Function evaluations: 23
+         Gradient evaluations: 23
+Iteration Time: 11.32s
+Period   39  Tr            Eel           f0           f1           f2           f
+   1.3408e+01Pa   6.5053e-04pJ   1.7977e-02   4.4884e-02   3.3976e-03   4.4884e-02
+   1.3417e+01Pa   6.5052e-04pJ   1.8002e-02   4.4884e-02   3.3984e-03   4.4884e-02
+   1.3420e+01Pa   6.5052e-04pJ   1.8009e-02   4.4884e-02   3.3986e-03   4.4884e-02
+   1.3426e+01Pa   6.5052e-04pJ   1.8025e-02   4.4883e-02   3.3993e-03   4.4883e-02
+   1.3428e+01Pa   6.5052e-04pJ   1.8032e-02   4.4883e-02   3.3995e-03   4.4883e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044883
+         Iterations: 5
+         Function evaluations: 25
+         Gradient evaluations: 25
+Iteration Time: 12.75s
+update isTfv at step 39
+Period   40  Tr            Eel           f0           f1           f2           f
+   1.3428e+01Pa   6.5051e-04pJ   1.8032e-02   4.4883e-02   3.3991e-03   4.4883e-02
+   1.3428e+01Pa   6.5051e-04pJ   1.8032e-02   4.4883e-02   3.3991e-03   4.4883e-02
+   1.3426e+01Pa   6.5051e-04pJ   1.8027e-02   4.4883e-02   3.3992e-03   4.4883e-02
+   1.3420e+01Pa   6.5051e-04pJ   1.8009e-02   4.4883e-02   3.3991e-03   4.4883e-02
+   1.3417e+01Pa   6.5050e-04pJ   1.8000e-02   4.4883e-02   3.3981e-03   4.4883e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044883
+         Iterations: 5
+         Function evaluations: 24
+         Gradient evaluations: 24
+Iteration Time: 11.01s
+Period   41  Tr            Eel           f0           f1           f2           f
+   1.3414e+01Pa   6.5050e-04pJ   1.7992e-02   4.4882e-02   3.3988e-03   4.4882e-02
+   1.3416e+01Pa   6.5049e-04pJ   1.7998e-02   4.4882e-02   3.3994e-03   4.4882e-02
+   1.3416e+01Pa   6.5049e-04pJ   1.7998e-02   4.4882e-02   3.3994e-03   4.4882e-02
+   1.3426e+01Pa   6.5049e-04pJ   1.8026e-02   4.4882e-02   3.4005e-03   4.4882e-02
+   1.3443e+01Pa   6.5049e-04pJ   1.8073e-02   4.4882e-02   3.4014e-03   4.4882e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044882
+         Iterations: 5
+         Function evaluations: 24
+         Gradient evaluations: 24
+Iteration Time: 11.19s
+Period   42  Tr            Eel           f0           f1           f2           f
+   1.3441e+01Pa   6.5049e-04pJ   1.8067e-02   4.4881e-02   3.4010e-03   4.4881e-02
+   1.3436e+01Pa   6.5048e-04pJ   1.8051e-02   4.4881e-02   3.3999e-03   4.4881e-02
+   1.3434e+01Pa   6.5047e-04pJ   1.8047e-02   4.4881e-02   3.3995e-03   4.4881e-02
+   1.3421e+01Pa   6.5046e-04pJ   1.8013e-02   4.4880e-02   3.3985e-03   4.4880e-02
+   1.3418e+01Pa   6.5046e-04pJ   1.8004e-02   4.4880e-02   3.3982e-03   4.4880e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044880
+         Iterations: 5
+         Function evaluations: 26
+         Gradient evaluations: 26
+Iteration Time: 11.94s
+Period   43  Tr            Eel           f0           f1           f2           f
+   1.3418e+01Pa   6.5046e-04pJ   1.8004e-02   4.4879e-02   3.3983e-03   4.4879e-02
+   1.3418e+01Pa   6.5046e-04pJ   1.8003e-02   4.4879e-02   3.3984e-03   4.4879e-02
+   1.3418e+01Pa   6.5046e-04pJ   1.8004e-02   4.4879e-02   3.3984e-03   4.4879e-02
+   1.3421e+01Pa   6.5046e-04pJ   1.8012e-02   4.4879e-02   3.3992e-03   4.4879e-02
+   1.3426e+01Pa   6.5045e-04pJ   1.8027e-02   4.4879e-02   3.4013e-03   4.4879e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044879
+         Iterations: 5
+         Function evaluations: 19
+         Gradient evaluations: 19
+Iteration Time: 8.55s
+Period   44  Tr            Eel           f0           f1           f2           f
+   1.3423e+01Pa   6.5045e-04pJ   1.8019e-02   4.4879e-02   3.4005e-03   4.4879e-02
+   1.3409e+01Pa   6.5044e-04pJ   1.7980e-02   4.4878e-02   3.3998e-03   4.4878e-02
+   1.3408e+01Pa   6.5044e-04pJ   1.7978e-02   4.4878e-02   3.3998e-03   4.4878e-02
+   1.3407e+01Pa   6.5043e-04pJ   1.7974e-02   4.4878e-02   3.4010e-03   4.4878e-02
+   1.3407e+01Pa   6.5043e-04pJ   1.7974e-02   4.4878e-02   3.4010e-03   4.4878e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044878
+         Iterations: 5
+         Function evaluations: 31
+         Gradient evaluations: 31
+Iteration Time: 13.85s
+Period   45  Tr            Eel           f0           f1           f2           f
+   1.3407e+01Pa   6.5043e-04pJ   1.7974e-02   4.4878e-02   3.4010e-03   4.4878e-02
+   1.3406e+01Pa   6.5043e-04pJ   1.7972e-02   4.4878e-02   3.4010e-03   4.4878e-02
+   1.3406e+01Pa   6.5043e-04pJ   1.7972e-02   4.4878e-02   3.4010e-03   4.4878e-02
+   1.3405e+01Pa   6.5043e-04pJ   1.7970e-02   4.4877e-02   3.4010e-03   4.4877e-02
+   1.3405e+01Pa   6.5043e-04pJ   1.7970e-02   4.4877e-02   3.4010e-03   4.4877e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044877
+         Iterations: 5
+         Function evaluations: 17
+         Gradient evaluations: 17
+Iteration Time: 7.58s
+Period   46  Tr            Eel           f0           f1           f2           f
+   1.3405e+01Pa   6.5043e-04pJ   1.7970e-02   4.4877e-02   3.4010e-03   4.4877e-02
+   1.3405e+01Pa   6.5043e-04pJ   1.7970e-02   4.4877e-02   3.4011e-03   4.4877e-02
+   1.3406e+01Pa   6.5043e-04pJ   1.7972e-02   4.4877e-02   3.4011e-03   4.4877e-02
+   1.3409e+01Pa   6.5043e-04pJ   1.7979e-02   4.4877e-02   3.4014e-03   4.4877e-02
+   1.3409e+01Pa   6.5043e-04pJ   1.7980e-02   4.4877e-02   3.4015e-03   4.4877e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044877
+         Iterations: 5
+         Function evaluations: 16
+         Gradient evaluations: 16
+Iteration Time: 7.19s
+Period   47  Tr            Eel           f0           f1           f2           f
+   1.3409e+01Pa   6.5043e-04pJ   1.7980e-02   4.4877e-02   3.4014e-03   4.4877e-02
+   1.3411e+01Pa   6.5043e-04pJ   1.7985e-02   4.4877e-02   3.4009e-03   4.4877e-02
+   1.3413e+01Pa   6.5042e-04pJ   1.7990e-02   4.4877e-02   3.4009e-03   4.4877e-02
+   1.3437e+01Pa   6.5042e-04pJ   1.8056e-02   4.4877e-02   3.4005e-03   4.4877e-02
+   1.3448e+01Pa   6.5041e-04pJ   1.8086e-02   4.4876e-02   3.3999e-03   4.4876e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044876
+         Iterations: 5
+         Function evaluations: 22
+         Gradient evaluations: 22
+Iteration Time: 9.92s
+Period   48  Tr            Eel           f0           f1           f2           f
+   1.3445e+01Pa   6.5041e-04pJ   1.8077e-02   4.4876e-02   3.3998e-03   4.4876e-02
+   1.3413e+01Pa   6.5040e-04pJ   1.7991e-02   4.4876e-02   3.4006e-03   4.4876e-02
+   1.3410e+01Pa   6.5040e-04pJ   1.7984e-02   4.4875e-02   3.4007e-03   4.4875e-02
+   1.3405e+01Pa   6.5040e-04pJ   1.7968e-02   4.4875e-02   3.4030e-03   4.4875e-02
+   1.3405e+01Pa   6.5040e-04pJ   1.7968e-02   4.4875e-02   3.4031e-03   4.4875e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044875
+         Iterations: 5
+         Function evaluations: 25
+         Gradient evaluations: 25
+Iteration Time: 11.53s
+Period   49  Tr            Eel           f0           f1           f2           f
+   1.3405e+01Pa   6.5040e-04pJ   1.7968e-02   4.4875e-02   3.4030e-03   4.4875e-02
+   1.3414e+01Pa   6.5039e-04pJ   1.7992e-02   4.4875e-02   3.4017e-03   4.4875e-02
+   1.3423e+01Pa   6.5039e-04pJ   1.8019e-02   4.4874e-02   3.4013e-03   4.4874e-02
+   1.3424e+01Pa   6.5038e-04pJ   1.8021e-02   4.4874e-02   3.4014e-03   4.4874e-02
+   1.3440e+01Pa   6.5038e-04pJ   1.8063e-02   4.4874e-02   3.4021e-03   4.4874e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044874
+         Iterations: 5
+         Function evaluations: 24
+         Gradient evaluations: 24
+Iteration Time: 10.67s
+update isTfv at step 49
+Period   50  Tr            Eel           f0           f1           f2           f
+   1.3438e+01Pa   6.5038e-04pJ   1.8059e-02   4.4874e-02   3.4019e-03   4.4874e-02
+   1.3437e+01Pa   6.5037e-04pJ   1.8055e-02   4.4874e-02   3.4018e-03   4.4874e-02
+   1.3434e+01Pa   6.5037e-04pJ   1.8046e-02   4.4874e-02   3.4020e-03   4.4874e-02
+   1.3430e+01Pa   6.5037e-04pJ   1.8035e-02   4.4873e-02   3.4022e-03   4.4873e-02
+   1.3428e+01Pa   6.5037e-04pJ   1.8030e-02   4.4873e-02   3.4021e-03   4.4873e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044873
+         Iterations: 5
+         Function evaluations: 23
+         Gradient evaluations: 23
+Iteration Time: 10.17s
+Period   51  Tr            Eel           f0           f1           f2           f
+   1.3427e+01Pa   6.5037e-04pJ   1.8029e-02   4.4873e-02   3.4021e-03   4.4873e-02
+   1.3426e+01Pa   6.5037e-04pJ   1.8027e-02   4.4873e-02   3.4022e-03   4.4873e-02
+   1.3427e+01Pa   6.5037e-04pJ   1.8027e-02   4.4873e-02   3.4021e-03   4.4873e-02
+   1.3427e+01Pa   6.5037e-04pJ   1.8027e-02   4.4873e-02   3.4021e-03   4.4873e-02
+   1.3428e+01Pa   6.5036e-04pJ   1.8032e-02   4.4873e-02   3.4029e-03   4.4873e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044873
+         Iterations: 5
+         Function evaluations: 22
+         Gradient evaluations: 22
+Iteration Time: 10.23s
+Period   52  Tr            Eel           f0           f1           f2           f
+   1.3426e+01Pa   6.5036e-04pJ   1.8026e-02   4.4873e-02   3.4026e-03   4.4873e-02
+   1.3425e+01Pa   6.5036e-04pJ   1.8023e-02   4.4873e-02   3.4025e-03   4.4873e-02
+   1.3425e+01Pa   6.5036e-04pJ   1.8022e-02   4.4873e-02   3.4025e-03   4.4873e-02
+   1.3424e+01Pa   6.5036e-04pJ   1.8020e-02   4.4873e-02   3.4025e-03   4.4873e-02
+   1.3424e+01Pa   6.5036e-04pJ   1.8020e-02   4.4873e-02   3.4026e-03   4.4873e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044873
+         Iterations: 5
+         Function evaluations: 18
+         Gradient evaluations: 18
+Iteration Time: 8.31s
+Period   53  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5036e-04pJ   1.8019e-02   4.4873e-02   3.4026e-03   4.4873e-02
+   1.3424e+01Pa   6.5036e-04pJ   1.8019e-02   4.4873e-02   3.4026e-03   4.4873e-02
+   1.3423e+01Pa   6.5036e-04pJ   1.8019e-02   4.4873e-02   3.4026e-03   4.4873e-02
+   1.3423e+01Pa   6.5036e-04pJ   1.8019e-02   4.4873e-02   3.4027e-03   4.4873e-02
+   1.3423e+01Pa   6.5036e-04pJ   1.8018e-02   4.4873e-02   3.4027e-03   4.4873e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044873
+         Iterations: 5
+         Function evaluations: 19
+         Gradient evaluations: 19
+Iteration Time: 8.65s
+Period   54  Tr            Eel           f0           f1           f2           f
+   1.3423e+01Pa   6.5036e-04pJ   1.8018e-02   4.4873e-02   3.4027e-03   4.4873e-02
+   1.3423e+01Pa   6.5036e-04pJ   1.8018e-02   4.4873e-02   3.4027e-03   4.4873e-02
+   1.3423e+01Pa   6.5036e-04pJ   1.8018e-02   4.4873e-02   3.4027e-03   4.4873e-02
+   1.3423e+01Pa   6.5036e-04pJ   1.8018e-02   4.4872e-02   3.4027e-03   4.4872e-02
+   1.3423e+01Pa   6.5036e-04pJ   1.8017e-02   4.4872e-02   3.4027e-03   4.4872e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044872
+         Iterations: 5
+         Function evaluations: 11
+         Gradient evaluations: 11
+Iteration Time: 4.93s
+Period   55  Tr            Eel           f0           f1           f2           f
+   1.3423e+01Pa   6.5036e-04pJ   1.8017e-02   4.4872e-02   3.4027e-03   4.4872e-02
+   1.3423e+01Pa   6.5036e-04pJ   1.8017e-02   4.4872e-02   3.4027e-03   4.4872e-02
+   1.3423e+01Pa   6.5036e-04pJ   1.8017e-02   4.4872e-02   3.4028e-03   4.4872e-02
+   1.3423e+01Pa   6.5036e-04pJ   1.8017e-02   4.4872e-02   3.4028e-03   4.4872e-02
+   1.3423e+01Pa   6.5036e-04pJ   1.8017e-02   4.4872e-02   3.4028e-03   4.4872e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044872
+         Iterations: 5
+         Function evaluations: 10
+         Gradient evaluations: 10
+Iteration Time: 4.78s
+Period   56  Tr            Eel           f0           f1           f2           f
+   1.3423e+01Pa   6.5036e-04pJ   1.8017e-02   4.4872e-02   3.4028e-03   4.4872e-02
+   1.3423e+01Pa   6.5036e-04pJ   1.8017e-02   4.4872e-02   3.4028e-03   4.4872e-02
+   1.3423e+01Pa   6.5036e-04pJ   1.8017e-02   4.4872e-02   3.4028e-03   4.4872e-02
+   1.3423e+01Pa   6.5036e-04pJ   1.8017e-02   4.4872e-02   3.4029e-03   4.4872e-02
+   1.3423e+01Pa   6.5036e-04pJ   1.8017e-02   4.4872e-02   3.4029e-03   4.4872e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044872
+         Iterations: 5
+         Function evaluations: 14
+         Gradient evaluations: 14
+Iteration Time: 6.97s
+Period   57  Tr            Eel           f0           f1           f2           f
+   1.3423e+01Pa   6.5036e-04pJ   1.8017e-02   4.4872e-02   3.4029e-03   4.4872e-02
+   1.3422e+01Pa   6.5036e-04pJ   1.8015e-02   4.4872e-02   3.4030e-03   4.4872e-02
+   1.3422e+01Pa   6.5036e-04pJ   1.8015e-02   4.4872e-02   3.4030e-03   4.4872e-02
+   1.3422e+01Pa   6.5036e-04pJ   1.8016e-02   4.4872e-02   3.4031e-03   4.4872e-02
+   1.3422e+01Pa   6.5036e-04pJ   1.8016e-02   4.4872e-02   3.4031e-03   4.4872e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044872
+         Iterations: 5
+         Function evaluations: 15
+         Gradient evaluations: 15
+Iteration Time: 6.81s
+Period   58  Tr            Eel           f0           f1           f2           f
+   1.3422e+01Pa   6.5036e-04pJ   1.8016e-02   4.4872e-02   3.4031e-03   4.4872e-02
+   1.3422e+01Pa   6.5035e-04pJ   1.8014e-02   4.4872e-02   3.4031e-03   4.4872e-02
+   1.3423e+01Pa   6.5035e-04pJ   1.8017e-02   4.4872e-02   3.4032e-03   4.4872e-02
+   1.3433e+01Pa   6.5035e-04pJ   1.8045e-02   4.4872e-02   3.4032e-03   4.4872e-02
+   1.3435e+01Pa   6.5034e-04pJ   1.8049e-02   4.4872e-02   3.4034e-03   4.4872e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044872
+         Iterations: 5
+         Function evaluations: 21
+         Gradient evaluations: 21
+Iteration Time: 9.43s
+Period   59  Tr            Eel           f0           f1           f2           f
+   1.3432e+01Pa   6.5034e-04pJ   1.8041e-02   4.4871e-02   3.4033e-03   4.4871e-02
+   1.3424e+01Pa   6.5034e-04pJ   1.8020e-02   4.4871e-02   3.4036e-03   4.4871e-02
+   1.3420e+01Pa   6.5033e-04pJ   1.8009e-02   4.4871e-02   3.4049e-03   4.4871e-02
+   1.3419e+01Pa   6.5033e-04pJ   1.8007e-02   4.4870e-02   3.4053e-03   4.4870e-02
+   1.3419e+01Pa   6.5033e-04pJ   1.8007e-02   4.4870e-02   3.4053e-03   4.4870e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044870
+         Iterations: 5
+         Function evaluations: 25
+         Gradient evaluations: 25
+Iteration Time: 11.96s
+update isTfv at step 59
+Period   60  Tr            Eel           f0           f1           f2           f
+   1.3419e+01Pa   6.5033e-04pJ   1.8007e-02   4.4870e-02   3.4053e-03   4.4870e-02
+   1.3419e+01Pa   6.5033e-04pJ   1.8008e-02   4.4870e-02   3.4054e-03   4.4870e-02
+   1.3419e+01Pa   6.5033e-04pJ   1.8008e-02   4.4870e-02   3.4053e-03   4.4870e-02
+   1.3420e+01Pa   6.5033e-04pJ   1.8008e-02   4.4870e-02   3.4053e-03   4.4870e-02
+   1.3420e+01Pa   6.5033e-04pJ   1.8008e-02   4.4870e-02   3.4053e-03   4.4870e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044870
+         Iterations: 5
+         Function evaluations: 13
+         Gradient evaluations: 13
+Iteration Time: 6.50s
+Period   61  Tr            Eel           f0           f1           f2           f
+   1.3420e+01Pa   6.5033e-04pJ   1.8008e-02   4.4870e-02   3.4053e-03   4.4870e-02
+   1.3420e+01Pa   6.5032e-04pJ   1.8008e-02   4.4870e-02   3.4052e-03   4.4870e-02
+   1.3419e+01Pa   6.5032e-04pJ   1.8008e-02   4.4870e-02   3.4052e-03   4.4870e-02
+   1.3420e+01Pa   6.5032e-04pJ   1.8009e-02   4.4870e-02   3.4048e-03   4.4870e-02
+   1.3420e+01Pa   6.5032e-04pJ   1.8010e-02   4.4870e-02   3.4048e-03   4.4870e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044870
+         Iterations: 5
+         Function evaluations: 18
+         Gradient evaluations: 18
+Iteration Time: 8.73s
+Period   62  Tr            Eel           f0           f1           f2           f
+   1.3420e+01Pa   6.5032e-04pJ   1.8010e-02   4.4870e-02   3.4048e-03   4.4870e-02
+   1.3420e+01Pa   6.5032e-04pJ   1.8011e-02   4.4870e-02   3.4049e-03   4.4870e-02
+   1.3420e+01Pa   6.5032e-04pJ   1.8011e-02   4.4870e-02   3.4050e-03   4.4870e-02
+   1.3421e+01Pa   6.5032e-04pJ   1.8011e-02   4.4870e-02   3.4051e-03   4.4870e-02
+   1.3422e+01Pa   6.5032e-04pJ   1.8015e-02   4.4870e-02   3.4057e-03   4.4870e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044870
+         Iterations: 5
+         Function evaluations: 17
+         Gradient evaluations: 17
+Iteration Time: 8.74s
+Period   63  Tr            Eel           f0           f1           f2           f
+   1.3422e+01Pa   6.5032e-04pJ   1.8015e-02   4.4870e-02   3.4054e-03   4.4870e-02
+   1.3422e+01Pa   6.5032e-04pJ   1.8015e-02   4.4870e-02   3.4054e-03   4.4870e-02
+   1.3421e+01Pa   6.5032e-04pJ   1.8013e-02   4.4870e-02   3.4055e-03   4.4870e-02
+   1.3421e+01Pa   6.5032e-04pJ   1.8013e-02   4.4870e-02   3.4055e-03   4.4870e-02
+   1.3421e+01Pa   6.5032e-04pJ   1.8013e-02   4.4870e-02   3.4055e-03   4.4870e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044870
+         Iterations: 5
+         Function evaluations: 25
+         Gradient evaluations: 25
+Iteration Time: 11.89s
+Period   64  Tr            Eel           f0           f1           f2           f
+   1.3421e+01Pa   6.5032e-04pJ   1.8013e-02   4.4870e-02   3.4055e-03   4.4870e-02
+   1.3421e+01Pa   6.5032e-04pJ   1.8013e-02   4.4870e-02   3.4055e-03   4.4870e-02
+   1.3421e+01Pa   6.5032e-04pJ   1.8013e-02   4.4870e-02   3.4055e-03   4.4870e-02
+   1.3421e+01Pa   6.5032e-04pJ   1.8012e-02   4.4870e-02   3.4054e-03   4.4870e-02
+   1.3422e+01Pa   6.5031e-04pJ   1.8016e-02   4.4870e-02   3.4054e-03   4.4870e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044870
+         Iterations: 5
+         Function evaluations: 18
+         Gradient evaluations: 18
+Iteration Time: 8.70s
+Period   65  Tr            Eel           f0           f1           f2           f
+   1.3422e+01Pa   6.5031e-04pJ   1.8016e-02   4.4869e-02   3.4054e-03   4.4869e-02
+   1.3423e+01Pa   6.5031e-04pJ   1.8019e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4057e-03   4.4869e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044869
+         Iterations: 5
+         Function evaluations: 15
+         Gradient evaluations: 15
+Iteration Time: 7.44s
+Period   66  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4057e-03   4.4869e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044869
+         Iterations: 5
+         Function evaluations: 13
+         Gradient evaluations: 13
+Iteration Time: 7.54s
+Period   67  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8019e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8019e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4057e-03   4.4869e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044869
+         Iterations: 5
+         Function evaluations: 13
+         Gradient evaluations: 13
+Iteration Time: 6.74s
+Period   68  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8022e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3425e+01Pa   6.5031e-04pJ   1.8022e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3425e+01Pa   6.5031e-04pJ   1.8023e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3425e+01Pa   6.5031e-04pJ   1.8023e-02   4.4869e-02   3.4055e-03   4.4869e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044869
+         Iterations: 5
+         Function evaluations: 19
+         Gradient evaluations: 19
+Iteration Time: 9.12s
+Period   69  Tr            Eel           f0           f1           f2           f
+   1.3425e+01Pa   6.5031e-04pJ   1.8022e-02   4.4869e-02   3.4055e-03   4.4869e-02
+   1.3425e+01Pa   6.5031e-04pJ   1.8022e-02   4.4869e-02   3.4055e-03   4.4869e-02
+   1.3425e+01Pa   6.5031e-04pJ   1.8022e-02   4.4869e-02   3.4055e-03   4.4869e-02
+   1.3425e+01Pa   6.5031e-04pJ   1.8022e-02   4.4869e-02   3.4055e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8022e-02   4.4869e-02   3.4055e-03   4.4869e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044869
+         Iterations: 5
+         Function evaluations: 13
+         Gradient evaluations: 13
+Iteration Time: 6.49s
+update isTfv at step 69
+Period   70  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5031e-04pJ   1.8022e-02   4.4869e-02   3.4055e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8022e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8022e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3425e+01Pa   6.5031e-04pJ   1.8022e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3425e+01Pa   6.5031e-04pJ   1.8022e-02   4.4869e-02   3.4056e-03   4.4869e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044869
+         Iterations: 5
+         Function evaluations: 11
+         Gradient evaluations: 11
+Iteration Time: 5.01s
+Period   71  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5031e-04pJ   1.8022e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4056e-03   4.4869e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044869
+         Iterations: 5
+         Function evaluations: 15
+         Gradient evaluations: 15
+Iteration Time: 6.67s
+Period   72  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4056e-03   4.4869e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044869
+         Iterations: 5
+         Function evaluations: 11
+         Gradient evaluations: 11
+Iteration Time: 4.98s
+Period   73  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4056e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4057e-03   4.4869e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044869
+         Iterations: 5
+         Function evaluations: 12
+         Gradient evaluations: 12
+Iteration Time: 5.44s
+Period   74  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4057e-03   4.4869e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044869
+         Iterations: 5
+         Function evaluations: 14
+         Gradient evaluations: 14
+Iteration Time: 6.36s
+Period   75  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4057e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044869
+         Iterations: 5
+         Function evaluations: 12
+         Gradient evaluations: 12
+Iteration Time: 5.50s
+Period   76  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4058e-03   4.4869e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044869
+         Iterations: 5
+         Function evaluations: 10
+         Gradient evaluations: 10
+Iteration Time: 4.57s
+Period   77  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4058e-03   4.4869e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044869
+         Iterations: 5
+         Function evaluations: 15
+         Gradient evaluations: 15
+Iteration Time: 6.85s
+Period   78  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8020e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044869
+         Iterations: 5
+         Function evaluations: 9
+         Gradient evaluations: 9
+Iteration Time: 4.23s
+Period   79  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044869
+         Iterations: 5
+         Function evaluations: 16
+         Gradient evaluations: 16
+Iteration Time: 7.23s
+update isTfv at step 79
+Period   80  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.044869
+         Iterations: 5
+         Function evaluations: 10
+         Gradient evaluations: 10
+Iteration Time: 4.53s
+Period   81  Tr            Eel           f0           f1           f2           f
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+   1.3424e+01Pa   6.5031e-04pJ   1.8021e-02   4.4869e-02   3.4058e-03   4.4869e-02
+Optimization terminated successfully.
+         Current function value: 0.044869
+         Iterations: 2
+         Function evaluations: 5
+         Gradient evaluations: 5
+Iteration Time: 2.34s
+Total Wall Time: 915.11s
+     fun: 0.04486883361468235
+     jac: array([-3.62406278e-07, -2.34098696e-08, -2.63947895e-07, ...,
+        2.47879249e-08,  7.16655519e-08,  1.12534111e-07])
+ message: 'Optimization terminated successfully.'
+    nfev: 5
+     nit: 2
+    njev: 5
+  status: 0
+ success: True
+       x: array([  0.47087221,   2.35825154,   1.28580592, ...,   0.42391819,
+       -11.51703041,   0.64870417])
+Traction residual: 1.3424e+01 Pa
+Elastic energy: 6.5031e-04 pJ
+funval: 1.8021e-02 4.4869e-02

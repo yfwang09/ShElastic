@@ -73,7 +73,7 @@ def TransMat(t_mesh=None, p_mesh=None, lJmax=None):
     """
     # if t_mesh and p_mesh not provide, use lJmax to generate the mesh
     if (t_mesh is None) and (p_mesh is None) and (lJmax is not None):
-        latglq, longlq = _psh.expand.GLQGridCoord(lJmax)
+        latglq, longlq = _psh.expand.GLQGridCoord(lJmax, extend=True)
         theta = _np.radians(90-latglq)
         phi = _np.radians(longlq)
         p_mesh, t_mesh = _np.meshgrid(phi, theta)
@@ -109,7 +109,7 @@ def GLQCartCoord(lmax):
             The maximum spherical harmonic degree that will be integrated exactly by
             Gauss-Legendre quadrature.
     '''
-    latsdeg, lonsdeg = _psh.expand.GLQGridCoord(lmax)
+    latsdeg, lonsdeg = _psh.expand.GLQGridCoord(lmax, extend=True)
     lon = _np.deg2rad(lonsdeg)
     colat = _np.deg2rad(90-latsdeg)
     PHI, THETA = _np.meshgrid(lon, colat)
@@ -370,9 +370,6 @@ def SHmesh2Vec(xmesh, lmax=None, Complex=True):
 
     """
     nlat, nlon, nd = xmesh.shape
-    if not 2*(nlat - 1) == nlon - 1:
-        print('SHmesh2Vec: non-GLQ meshing is not supported!')
-        return -1
     if lmax is None:
         lmax = nlat - 1
     if not Complex:

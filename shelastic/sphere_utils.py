@@ -66,11 +66,6 @@ def arbitrary_force(rcut_r0, mu0 = 300/3, nu0 = 0.499, r0 = 5, pF=1, noise_level
     Vr, Vtheta, Vphi = CartCoord_to_SphCoord(Vp[...,0], Vp[...,1], Vp[...,2])
     noise = np.random.normal(scale=noise_level, size=npts)
     Vp = np.stack(SphCoord_to_CartCoord(Vr + noise, Vtheta, Vphi), axis=-1)
-    # noise_x = np.random.normal(scale=noise_level, size=npts)
-    # noise_y = np.random.normal(scale=noise_level, size=npts)
-    # noise_z = np.random.normal(scale=noise_level*3, size=npts)
-    # noise = np.stack([noise_x, noise_y, noise_z], axis=-1)
-    # Vp += noise
 
     # obtain the traction-free region
     TcLeft = (rcut+dilation) > np.linalg.norm(VX0 - pLeft.reshape(1, 1, 3), axis=-1)
@@ -80,8 +75,12 @@ def arbitrary_force(rcut_r0, mu0 = 300/3, nu0 = 0.499, r0 = 5, pF=1, noise_level
         fig, axs = visSHVec(Tvec*mu0, lmax_plot=lmax_plot, SphCoord=True, Complex=True,
                             config_quiver=(2, 3, 'k', 1000), lonshift=180, figsize=(6,3), 
                             n_vrange=(-100, 100), s_vrange=(0, 50), show=False)
-        LONS = np.rad2deg(Vphi).reshape((lmax_plot+1, 2*lmax_plot+1))
-        LATS = 90 - np.rad2deg(Vtheta).reshape((lmax_plot+1, 2*lmax_plot+1))
+        if len(Vphi) == (lmax_plot+1)*(2*lmax_plot+1):
+            Vshape = (lmax_plot+1, 2*lmax_plot+1)
+        else:
+            Vshape = (lmax_plot+1, 2*lmax_plot+2)
+        LONS = np.rad2deg(Vphi).reshape(Vshape)
+        LATS = 90 - np.rad2deg(Vtheta).reshape(Vshape)
         axs[0].contour(LONS, LATS, TfRegion, [0.5,], colors='k', linewidths=1)
         axs[1].contour(LONS, LATS, TfRegion, [0.5,], colors='k', linewidths=1)
     
@@ -137,7 +136,7 @@ def calculateTfv(Uvec, lJmax, Vp, Tfv, lat_weight=False):
     dist2mat = np.linalg.norm((Xt[..., np.newaxis, :] - Vp), axis=-1)
     arg_list_x = dist2mat.argmin(axis=-1)
     if lat_weight:
-        latsdeg, lonsdeg = pyshtools.expand.GLQGridCoord(lJmax)
+        latsdeg, lonsdeg = pyshtools.expand.GLQGridCoord(lJmax, extend=True)
         phi, theta = np.meshgrid(np.deg2rad(lonsdeg), np.deg2rad(90 - latsdeg))
         lat_weight = np.sin(theta)
     else:
@@ -148,7 +147,7 @@ def usurf2umesh(u_surf, f_interp, lmax, X0surf=None, X0=None):
     if lmax is None:
         lmax = (np.sqrt(8*u_surf.size/2+1)-3)//4
     if X0surf is None:
-        latsdeg, lonsdeg = pyshtools.expand.GLQGridCoord(lmax)
+        latsdeg, lonsdeg = pyshtools.expand.GLQGridCoord(lmax, extend=True)
         lon0, lat0 = np.meshgrid(lonsdeg, latsdeg)
         X0surf = np.stack([lat0, lon0], axis=-1)
     if X0 is None:

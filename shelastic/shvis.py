@@ -98,9 +98,6 @@ def vismesh(xmesh, cmap='viridis', show=False, SphCoord=True,
 
     """
     nlat, nlon, nd = xmesh.shape
-    if not (nlat - 1)*2 == (nlon - 1):
-        print('vismesh: only GLQ mesh is supported!')
-        return -1
     lmax_plot = nlat - 1
     if SphCoord:
         fig = [None for _ in range(2)]
@@ -112,7 +109,7 @@ def vismesh(xmesh, cmap='viridis', show=False, SphCoord=True,
         ax[0].set_title('norm')
         
         fig[1], ax[1] = plotfv(xshear, show=show, cmap='Reds', lonshift=lonshift, figsize=figsize, vrange=s_vrange)
-        latsdeg, lonsdeg = _psh.expand.GLQGridCoord(lmax_plot)
+        latsdeg, lonsdeg = _psh.expand.GLQGridCoord(lmax_plot, extend=True)
         lons, lats = _np.meshgrid(lonsdeg, latsdeg)
         xshift = _np.roll(xmesh, _np.round(lons.shape[1]*lonshift/360).astype(_np.int), axis=1)
         st, dq, color, scale = config_quiver
@@ -210,7 +207,7 @@ def visSH3d(xmesh, cmesh=None, r0=1, lmax_plot=None, cmap='RdBu', colorbar=False
     """
     if lmax_plot is None:
         lmax_plot = xmesh.shape[0] - 1
-    lats, lons = _psh.expand.GLQGridCoord(lmax_plot)
+    lats, lons = _psh.expand.GLQGridCoord(lmax_plot, extend=True)
     nlat = lats.size; nlon = lons.size;
 
     lats_circular = _np.hstack(([90.], lats, [-90.]))

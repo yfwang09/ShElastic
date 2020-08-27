@@ -21,12 +21,20 @@ ShElastic is a python package of the numerical method that solves linear elastic
 
 The examples are implemented as jupyter notebooks in `notebook` folder. Example 1 - 4 are discussed in reference [1], and example 5 is discussed in reference [2].
 
-0. Spherical void in an infinite medium with hydrostatic pressure
-1. Spherical void in an infinite medium with uniform tensile stress
-2. Spherical void in an infinite medium with an infinite long straight screw dislocation
-3. Spherical void in an infinite medium with a nearby prismatic dislocation loop
-4. Solid sphere under opposite balanced torsion
+0. Spherical void in an infinite medium under hydrostatic pressure
+1. Spherical void in an infinite medium under uniform tensile stress
+2. Spherical void in an infinite medium near an infinite long straight screw dislocation
+3. Spherical void in an infinite medium near a prismatic dislocation loop
+4. Solid sphere under torsional force on the surface
 5. Deformable hydrogel sphere under biological cellular forces
+
+### Run Examples on Google Colab (Recommended) ###
+
+* You only need to have a google account to be able to run the notebooks on Colab. All the package installation will be handled within the notebook.
+
+1. Open a notebook in `examples` folder (Case00 - Case05)
+2. Click the button ![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg) at the top to open the notebook in Colab.
+3. Run the notebook by clicking `runtime/run all`(`Ctrl+F9`), or clicking the play button on the left of each cell to run the notebook cell-by-cell.
 
 ### Installation guide ###
 
@@ -53,6 +61,6 @@ Please contact the authors if you have questions or want to contribute.
 
 ### Related Articles ###
 
-[1] Wang, Yifan, Xiaohan Zhang, and Wei Cai. "Spherical harmonics method for computing the image stress due to a spherical void." Journal of the Mechanics and Physics of Solids 126 (2019): 151-167. [(DOI)](https://doi.org/10.1016/j.jmps.2019.01.020) [(arXiv)](https://arxiv.org/abs/1806.11165v3)
+[1] Wang, Yifan, Xiaohan Zhang, and Wei Cai. "Spherical harmonics method for computing the image stress due to a spherical void." [Journal of the Mechanics and Physics of Solids 126 (2019): 151-167.](https://doi.org/10.1016/j.jmps.2019.01.020) [(arXiv)](https://arxiv.org/abs/1806.11165v3)
 
-[2] Vorselen, Daan, et al. "Superresolved microparticle traction force microscopy reveals subcellular force patterns in immune cell-target interactions." bioRxiv (2019): 431221. [DOI](https://doi.org/10.1101/431221) [Nature Communication (in publish)](https://doi.org/10.1038/s41467-019-13804-z)
+[2] Vorselen, Daan, Yifan Wang, Miguel M. de Jesus, Pavak K. Shah, Matthew J. Footer, Morgan Huse, Wei Cai, and Julie A. Theriot. "Microparticle traction force microscopy reveals subcellular force exertion patterns in immune cell–target interactions." [Nature communications 11, no. 1 (2020): 1-14.](https://doi.org/10.1038/s41467-019-13804-z) bioRxiv (2019): 431221. [DOI](https://doi.org/10.1101/431221)

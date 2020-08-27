@@ -4,66 +4,71 @@ addpath('dd3d')
 
 R_void = 1;                        % void radius
 
-% smaller loop
-% Sname = 's';
-% zlen  = 41;                         % discretization of loop position
-% zlist = linspace(0.67, 4.0, zlen);   % nodes on the loop
-% rho0 = 0.75*R_void;                 % radius of the loop
-% a_b_list = [40, 200, 400, 4000, 40000];
 
-% larger loop
-Sname = 'l';
-%zlen  = 21;                         % discretization of loop position
-%zlist = linspace(-1.0, 1.0, zlen);  % nodes on the loop
-zlist = [-4:0.2:-0.4, -0.2:0.04:0.2, 0.4:0.2:4]; 
-zlen = length(zlist);
-rho0 = 1.20*R_void;                 % radius of the loop
-a_b_list = [40, ];
+for loop = [0, 1]
 
-Ngrid = 40;                         % gridding on the void surface (2NxN)
-ndis  = 50;                         % discretize the loop
+    if loop == 0
+        % smaller loop
+        Sname = 's';
+        zlen  = 41;                         % discretization of loop position
+        zlist = linspace(0.67, 4.0, zlen);   % nodes on the loop
+        rho0 = 0.75*R_void;                 % radius of the loop
+        a_b_list = [40, 200, 400, 4000, 40000];
+    else
+        % larger loop
+        Sname = 'l';
+        zlist = [-4:0.2:-0.4, -0.2:0.04:0.2, 0.4:0.2:4]; 
+        zlen = length(zlist);
+        rho0 = 1.20*R_void;                 % radius of the loop
+        a_b_list = [40, ];
+    end
 
-for a_b = a_b_list
-    bmag = R_void/a_b;              % magnitude of burger's vector
-    disp(bmag)
+    Ngrid = 40;                         % gridding on the void surface (2NxN)
+    ndis  = 50;                         % discretize the loop
 
-    MU = 1;
-    NU = 1./3;
+    for a_b = a_b_list
+        bmag = R_void/a_b;              % magnitude of burger's vector
+        disp(bmag)
 
-    % figure; hold on;
-    for i = 1:zlen
-        % disp(i)
-        z0 = R_void*zlist(i);           % height of the loop
-        disp(z0)
+        MU = 1;
+        NU = 1./3;
 
-        % construct the loop
-        phi0 = [0:ndis-1]'*2*pi/ndis;   % [=] ndis x 1
-        rn = [rho0*cos(phi0), ...       % [=] ndis x 4 (x,y,z,nodetype)
-              rho0*sin(phi0), ones(ndis,1)*z0, zeros(ndis,1)];
-        link_id = [1:ndis; [2:ndis,1]]';        % [=] ndis x 2 (n1,n2)
-        burg = repmat([0, 0, 1], ndis, 1)*bmag; % [=] ndis x 3 (bx,by,bz)
-        dl = circshift(rn(:, 1:end-1), -1, 1) ...
-           - rn(:, 1:end-1);                    % r2 - r1 [=] ndis x 3
-        dlnorm = sqrt(sum(dl.^2, 2));           % [=] ndis x 1
-        xi = dl./repmat(dlnorm, [1, 3]);        % [=] ndis x 3
-        %disp(xi)
-        % slip = vecnorm(cross(burg, xi, 2), 2, 2);
-        nvec = cross(burg, xi, 2);              % b x xi [=] ndis x 3
-        %disp(nvec)
-        nnorm= sqrt(sum(nvec.^2, 2));           % [=] ndis x 1
-        %disp(nnorm)
-        slip = nvec./repmat(nnorm, [1, 3]);     % [=] ndis x 3 (nx,ny,nz)
-        %disp(slip)
-        links= [link_id, burg, slip];   % [=] ndis x 8
+        % figure; hold on;
+        for i = 1:zlen
+            % disp(i)
+            z0 = R_void*zlist(i);           % height of the loop
+            disp(z0)
 
-        % dislocation core (a=0.1, Ec=0)
-        a = 0.1;
-        appliedstress = 0.0*MU*eye(3);
+            % construct the loop
+            phi0 = [0:ndis-1]'*2*pi/ndis;   % [=] ndis x 1
+            rn = [rho0*cos(phi0), ...       % [=] ndis x 4 (x,y,z,nodetype)
+                  rho0*sin(phi0), ones(ndis,1)*z0, zeros(ndis,1)];
+            link_id = [1:ndis; [2:ndis,1]]';        % [=] ndis x 2 (n1,n2)
+            burg = repmat([0, 0, 1], ndis, 1)*bmag; % [=] ndis x 3 (bx,by,bz)
+            dl = circshift(rn(:, 1:end-1), -1, 1) ...
+               - rn(:, 1:end-1);                    % r2 - r1 [=] ndis x 3
+            dlnorm = sqrt(sum(dl.^2, 2));           % [=] ndis x 1
+            xi = dl./repmat(dlnorm, [1, 3]);        % [=] ndis x 3
+            %disp(xi)
+            % slip = vecnorm(cross(burg, xi, 2), 2, 2);
+            nvec = cross(burg, xi, 2);              % b x xi [=] ndis x 3
+            %disp(nvec)
+            nnorm= sqrt(sum(nvec.^2, 2));           % [=] ndis x 1
+            %disp(nnorm)
+            slip = nvec./repmat(nnorm, [1, 3]);     % [=] ndis x 3 (nx,ny,nz)
+            %disp(slip)
+            links= [link_id, burg, slip];   % [=] ndis x 8
 
-        % save the data for ShElastic
-        Susrfile = ['data_PDL/Susr',Sname,'_z', num2str(z0, '%.5f'), '_ab', num2str(a_b), '.mat'];
-        [ Tusr, Xgrid ] = tractionBC(MU, NU, a, rn, links, 0, appliedstress, R_void, Ngrid, 1);
-        save(Susrfile, 'Tusr', 'Xgrid', 'burg', 'rn')
+            % dislocation core (a=0.1, Ec=0)
+            a = 0.1;
+            appliedstress = 0.0*MU*eye(3);
+
+            % save the data for ShElastic
+            Susrfile = ['../../testdata/data_PDL/Susr',Sname,'_z', num2str(z0, '%.5f'), '_ab', num2str(a_b), '.mat'];
+            [ Tusr, Xgrid ] = tractionBC(MU, NU, a, rn, links, 0, appliedstress, R_void, Ngrid, 1);
+            save(Susrfile, 'Tusr', 'Xgrid', 'burg', 'rn')
+
+        end
 
     end
 

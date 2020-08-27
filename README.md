@@ -61,6 +61,6 @@ Please contact the authors if you have questions or want to contribute.
 
 ### Related Articles ###
 
-[1] Wang, Yifan, Xiaohan Zhang, and Wei Cai. "Spherical harmonics method for computing the image stress due to a spherical void." [Journal of the Mechanics and Physics of Solids 126 (2019): 151-167.](https://doi.org/10.1016/j.jmps.2019.01.020) [(arXiv)](https://arxiv.org/abs/1806.11165v3)
+[1] Wang, Yifan, Xiaohan Zhang, and Wei Cai. "Spherical harmonics method for computing the image stress due to a spherical void." [Journal of the Mechanics and Physics of Solids 126 (2019): 151-167.](https://doi.org/10.1016/j.jmps.2019.01.020)
 
-[2] Vorselen, Daan, Yifan Wang, Miguel M. de Jesus, Pavak K. Shah, Matthew J. Footer, Morgan Huse, Wei Cai, and Julie A. Theriot. "Microparticle traction force microscopy reveals subcellular force exertion patterns in immune cell–target interactions." [Nature communications 11, no. 1 (2020): 1-14.](https://doi.org/10.1038/s41467-019-13804-z) bioRxiv (2019): 431221. [DOI](https://doi.org/10.1101/431221)
+[2] Vorselen, Daan, Yifan Wang, Miguel M. de Jesus, Pavak K. Shah, Matthew J. Footer, Morgan Huse, Wei Cai, and Julie A. Theriot. "Microparticle traction force microscopy reveals subcellular force exertion patterns in immune cell–target interactions." [Nature communications 11, no. 1 (2020): 1-14.](https://doi.org/10.1038/s41467-019-13804-z) bioRxiv (2019): 431221.

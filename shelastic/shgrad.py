@@ -195,7 +195,7 @@ def VSH1(coeffs, norm='4pi', csphase=1):
     clm = _psh.SHCoeffs.from_array(coeffs, normalization=norm, csphase=csphase)
     grid = clm.expand('GLQ')
     grid_data = grid.data
-    latglq, longlq = _psh.expand.GLQGridCoord(clm.lmax)
+    latglq, longlq = _psh.expand.GLQGridCoord(clm.lmax, extend=True)
     LON, LAT = _np.meshgrid(longlq, latglq)
     THETA = _np.deg2rad(90-LAT)
     PHI = _np.deg2rad(LON)

@@ -102,14 +102,18 @@ def Ur_interp(Vp, lmax=30, plot_figure=False):
 
     lats = urgrid_interp.lats(); lons = urgrid_interp.lons();
     lats_circular = np.hstack(([90.], lats, [-90.]))
-    lons_circular = np.append(lons, 360)
+    xmesh = urgrid_interp.to_array().copy()
+    if lons[-1] != 360.0:
+        lons_circular = np.append(lons, 360)
+    else:
+        lons_circular = lons
+        xmesh = xmesh[:, :-1]
     LONS, LATS = np.meshgrid(lons_circular, lats_circular)
 
-    xmesh = urgrid_interp.to_array().copy()
     fpoints = np.zeros_like(LONS)
     fpoints[1:-1, :-1] = xmesh
-    fpoints[0, :] = np.mean(xmesh[0,:], axis=0)  # not exact !
-    fpoints[-1, :] = np.mean(xmesh[-1,:], axis=0)  # not exact !
+    fpoints[ 0, :] = np.mean(xmesh[ 0, :], axis=0)  # not exact !
+    fpoints[-1, :] = np.mean(xmesh[-1, :], axis=0)  # not exact !
     fpoints[1:-1, -1] = xmesh[:, 0]
     f_interp = RectBivariateSpline(lats_circular[::-1], lons_circular, fpoints[::-1, ], kx=1, ky=1)
     
@@ -152,7 +156,11 @@ def usurf2umesh(u_surf, f_interp, lmax, X0surf=None, X0=None):
         X0surf = np.stack([lat0, lon0], axis=-1)
     if X0 is None:
         X0 = GLQCartCoord(lmax)
-    x_surf = X0surf + u_surf.reshape(lmax+1, 2*lmax+1, 2)
+    if u_surf.size == (lmax+1)*(2*lmax+1)*2:
+        u_surf_reshape = u_surf.reshape(lmax+1, 2*lmax+1, 2)
+    else:
+        u_surf_reshape = u_surf.reshape(lmax+1, 2*lmax+2, 2)
+    x_surf = X0surf + u_surf_reshape
     lat_x = x_surf[..., 0]; lon_x = x_surf[...,1];
 
     Theta_x = np.deg2rad(90 - lat_x); Phi_x = np.deg2rad(lon_x);
@@ -161,7 +169,7 @@ def usurf2umesh(u_surf, f_interp, lmax, X0surf=None, X0=None):
     return (x - X0).flatten()
 
 def dumesh_dus(u_surf, f_interp, lmax, *args, eps=1e-5, mode='forward'):
-    u_surf = u_surf.reshape(lmax+1, 2*lmax+1, 2)
+    u_surf = u_surf.reshape(lmax+1, 2*lmax+2, 2)
     ptr = np.array([+eps, 0])
     ptu = np.array([0, +eps])
     u_mesh_r = usurf2umesh(u_surf + ptr, f_interp, lmax, *args)
@@ -185,7 +193,11 @@ def usurf2vec(u_surf, f_interp, lmax, X0surf=None, X0=None, Cmat=None, Dmat=None
     if Cmat is None and Dmat is None:
         Cmat, Dmat = loadCoeffs(mu0, nu0, lmax, 'reg')
     umesh = usurf2umesh(u_surf, f_interp, lmax, X0surf=X0surf, X0=X0)
-    Uvec  = SHmesh2Vec(umesh.reshape(lmax+1, 2*lmax+1, 3), lmax=lmax)
+    if umesh.size == (lmax+1)*(2*lmax+1)*3:
+        umesh_reshape = umesh.reshape(lmax+1, 2*lmax+1, 3)
+    else:
+        umesh_reshape = umesh.reshape(lmax+1, 2*lmax+2, 3)
+    Uvec  = SHmesh2Vec(umesh_reshape, lmax=lmax)
     aK    = spsolve(Dmat, Uvec.T)
     Tvec  = Cmat.dot(aK)
     return Uvec, aK, Tvec
@@ -207,11 +219,11 @@ def genLmat(lmax, Cmat=None, Dmat=None, mu0=300/3, nu0=0.499):
     '''Tmesh = Lmat.dot(Umesh)'''
     if Cmat is None and Dmat is None:
         Cmat, Dmat = loadCoeffs(mu0, nu0, lmax, 'reg')
-    meshsize = (lmax+1)*(2*lmax+1)*3
+    meshsize = (lmax+1)*(2*lmax+2)*3
     du= np.identity(meshsize)
     L = np.empty((meshsize, meshsize))
     for i in range(meshsize):
-        Uvec = SHmesh2Vec(du[:, i].reshape(lmax+1,2*lmax+1,3), lmax)
+        Uvec = SHmesh2Vec(du[:, i].reshape(lmax+1,2*lmax+2,3), lmax)
         Tvec = Uvec2Tvec(Uvec, Cmat, Dmat)
         L[:, i] = SHVec2mesh(Tvec, lmax=lmax, SphCoord=False, Complex=True).flatten()
     return L
@@ -220,12 +232,12 @@ def genSmat(lmax, Cmat=None, Dmat=None, mu0=300/3, nu0=0.499):
     '''Uvec = Smat.dot(Umesh)'''
     if Cmat is None and Dmat is None:
         Cmat, Dmat = loadCoeffs(mu0, nu0, lmax, 'reg')
-    meshsize = (lmax+1)*(2*lmax+1)*3
+    meshsize = (lmax+1)*(2*lmax+2)*3
     coefsize = (lmax+1)**2 * 3
     du= np.identity(meshsize)
     S = np.empty((coefsize, meshsize), dtype=np.complex)
     for i in range(meshsize):
-        Uvec = SHmesh2Vec(du[:, i].reshape(lmax+1, 2*lmax+1, 3), lmax)
+        Uvec = SHmesh2Vec(du[:, i].reshape(lmax+1, 2*lmax+2, 3), lmax)
         S[:, i] = Uvec.flatten()
     return S
 

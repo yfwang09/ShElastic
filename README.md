@@ -27,6 +27,7 @@ The examples are implemented as jupyter notebooks in `notebook` folder. Example 
 3. Spherical void in an infinite medium near a prismatic dislocation loop
 4. Solid sphere under torsional force on the surface
 5. Deformable hydrogel sphere under biological cellular forces
+6. Deformable hydrogel sphere under opposite forces (test case)
 
 ### Run Examples on Google Colab (Recommended) ###
 

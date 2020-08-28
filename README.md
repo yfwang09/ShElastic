@@ -8,6 +8,8 @@
 [![Twitter](https://img.shields.io/twitter/follow/pyshtools.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=pyshtools)
 -->
 
+This is a copy of our GitLab repository (https://gitlab.com/micronano_public/ShElastic). We create this copy to add Colab support for our examples.
+
 ShElastic is a python package of the numerical method that solves linear elasticity problem with displacement or traction boundary conditions on _spherical_ _interface_. The method is can be applied to both spherical void and solid sphere problem. The method is applied originally to solve spherical void problem of void-dislocation interaction in an infinite medium [1], and recently applied to solid sphere problem in cell-hydrogel interaction for measuring forces of the biological cell [2].
 
 ### FEATURES ###

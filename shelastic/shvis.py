@@ -173,7 +173,7 @@ def visSHVec(xvec, lmax_plot=None, cmap='viridis', show=True,
 
 def visSH3d(xmesh, cmesh=None, r0=1, lmax_plot=None, cmap='RdBu', colorbar=False,
             figsize=(16,16), show=True, filename=None, vmin=None, vmax=None,
-            elevation=0, azimuth=0, surface=False, color=None):
+            elevation=0, azimuth=0, surface=False, color=None, fig=None, ax=None, alpha=None):
     """Plot reconstructed spherical shape and traction colored 3d plot
 
     Returns
@@ -253,17 +253,20 @@ def visSH3d(xmesh, cmesh=None, r0=1, lmax_plot=None, cmap='RdBu', colorbar=False
         colors = cmap(norm(magn_face.flatten()))
         colors = colors.reshape(nlat + 1, nlon, 4)
 
-    fig = _plt.figure(figsize=figsize)
-    ax3d = fig.add_subplot(1, 1, 1, projection='3d')
+    if fig is None and ax is None:
+        fig = _plt.figure(figsize=figsize)
+        ax3d = fig.add_subplot(1, 1, 1, projection='3d')
+    else:
+        ax3d = ax
     if surface:
         if color is None:
-            surf = ax3d.plot_surface(x, y, z, rstride=1, cstride=1, facecolors=colors)
+            surf = ax3d.plot_surface(x, y, z, rstride=1, cstride=1, facecolors=colors, alpha=alpha)
         else:
-            surf = ax3d.plot_surface(x, y, z, rstride=1, cstride=1, color=color)
+            surf = ax3d.plot_surface(x, y, z, rstride=1, cstride=1, color=color, alpha=alpha)
         if colorbar:
             fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax3d, shrink=0.6)
     else:
-        ax3d.scatter(x, y, z)
+        ax3d.scatter(x, y, z, alpha=alpha)
     ax3d.view_init(elev=elevation, azim=azimuth)
     ax3d.tick_params(labelsize=16)
 

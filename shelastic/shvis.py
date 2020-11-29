@@ -173,7 +173,7 @@ def visSHVec(xvec, lmax_plot=None, cmap='viridis', show=True,
 
 def visSH3d(xmesh, cmesh=None, r0=1, lmax_plot=None, cmap='RdBu', colorbar=False,
             figsize=(16,16), show=True, filename=None, vmin=None, vmax=None,
-            elevation=0, azimuth=0, surface=False, color=None, fig=None, ax=None, alpha=None):
+            elevation=0, azimuth=0, surface=False, color=None, fig=None, ax=None, alpha=None, return_data=False):
     """Plot reconstructed spherical shape and traction colored 3d plot
 
     Returns
@@ -271,11 +271,14 @@ def visSH3d(xmesh, cmesh=None, r0=1, lmax_plot=None, cmap='RdBu', colorbar=False
     ax3d.tick_params(labelsize=16)
 
     if filename is not None:
-        plt.tight_layout()
+        _plt.tight_layout()
         fig.savefig(filename,transparent=True)
     if show:
-        plt.show(block=True)
-    return fig, ax3d
+        _plt.show(block=True)
+    if return_data:
+        return _np.stack([x, y, z], axis=-1), tpoints, [lats_circular, lons_circular]
+    else:
+        return fig, ax3d
 
 def visualize_Cmat(Csub, precision=1e-8, m_max=3):
     '''Visualizing coefficient matrix

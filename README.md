@@ -21,7 +21,7 @@ ShElastic is a python package of the numerical method that solves linear elastic
 
 ### EXAMPLES ###
 
-The examples are implemented as jupyter notebooks in `notebook` folder. Example 1 - 4 are discussed in reference [1], and example 5 is discussed in reference [2].
+The examples are implemented as jupyter notebooks in `notebook` folder. Example 1 - 4 are discussed in reference [1], example 5 and 6 are discussed in reference [2], and example 7 is for reference [3].
 
 0. Spherical void in an infinite medium under hydrostatic pressure
 1. Spherical void in an infinite medium under uniform tensile stress
@@ -30,6 +30,7 @@ The examples are implemented as jupyter notebooks in `notebook` folder. Example 
 4. Solid sphere under torsional force on the surface
 5. Deformable hydrogel sphere under biological cellular forces
 6. Deformable hydrogel sphere under opposite forces (test case)
+7. "Teeth" indentation on the equator of a sphere
 
 ### Run Examples on Google Colab (Recommended) ###
 
@@ -67,3 +68,5 @@ Please contact the authors if you have questions or want to contribute.
 [1] Wang, Yifan, Xiaohan Zhang, and Wei Cai. "Spherical harmonics method for computing the image stress due to a spherical void." [Journal of the Mechanics and Physics of Solids 126 (2019): 151-167.](https://doi.org/10.1016/j.jmps.2019.01.020)
 
 [2] Vorselen, Daan, Yifan Wang, Miguel M. de Jesus, Pavak K. Shah, Matthew J. Footer, Morgan Huse, Wei Cai, and Julie A. Theriot. "Microparticle traction force microscopy reveals subcellular force exertion patterns in immune cell–target interactions." [Nature communications 11, no. 1 (2020): 1-14.](https://doi.org/10.1038/s41467-019-13804-z)
+
+[3] Vorselen, Daan, Barger, Sarah R., Wang, Yifan, Cai, Wei, Theriot, Julie A., Gauthier, Nils C., Krendel, Mira, "Phagocytic 'teeth' and myosin-II 'jaw' power target constriction during phagocytosis." bioRxiv (2021).

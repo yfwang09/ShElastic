@@ -69,4 +69,4 @@ Please contact the authors if you have questions or want to contribute.
 
 [2] Vorselen, Daan, Yifan Wang, Miguel M. de Jesus, Pavak K. Shah, Matthew J. Footer, Morgan Huse, Wei Cai, and Julie A. Theriot. "Microparticle traction force microscopy reveals subcellular force exertion patterns in immune cell–target interactions." [Nature communications 11, no. 1 (2020): 1-14.](https://doi.org/10.1038/s41467-019-13804-z)
 
-[3] Vorselen, Daan, Barger, Sarah R., Wang, Yifan, Cai, Wei, Theriot, Julie A., Gauthier, Nils C., Krendel, Mira, "Phagocytic 'teeth' and myosin-II 'jaw' power target constriction during phagocytosis." bioRxiv (2021).
+[3] Vorselen, Daan, Barger, Sarah R., Wang, Yifan, Cai, Wei, Theriot, Julie A., Gauthier, Nils C., Krendel, Mira, "Phagocytic 'teeth' and myosin-II 'jaw' power target constriction during phagocytosis." [bioRxiv (2021)](https://www.biorxiv.org/content/10.1101/2021.03.14.435346v1.abstract).

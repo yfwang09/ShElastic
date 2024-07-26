@@ -8,6 +8,22 @@
 [![Twitter](https://img.shields.io/twitter/follow/pyshtools.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=pyshtools)
 -->
 
+**Updated 2024-07-25: The Google Colab support is not currently available due to the difficulty in downgrading python version.**
+
+**Suggested installation method:**
+
+1. Install Anaconda (https://www.anaconda.com/download)
+2. Create a new environment with the yml file in the repository:
+    `conda env create -f ShElastic.yml`
+3. Activate the environment:
+    `conda activate ShElastic`
+4. Open jupyter notebook:
+    `jupyter notebook`
+
+Then in the webpage popped out, you can view and run all the examples in the `examples` folder.
+
+The steps above are also available by using the Anaconda Navigator GUI (https://docs.anaconda.com/navigator).
+
 **This is a copy of our GitLab repository (https://gitlab.com/micronano_public/ShElastic). We create this copy to add Colab support for our examples.**
 
 ShElastic is a python package of the numerical method that solves linear elasticity problem with displacement or traction boundary conditions on _spherical_ _interface_. The method is can be applied to both spherical void and solid sphere problem. The method is applied originally to solve spherical void problem of void-dislocation interaction in an infinite medium [1], and recently applied to solid sphere problem in cell-hydrogel interaction for measuring forces of the biological cell [2].

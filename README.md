@@ -48,14 +48,6 @@ The examples are implemented as jupyter notebooks in `notebook` folder. Example 
 6. Deformable hydrogel sphere under opposite forces (test case)
 7. "Teeth" indentation on the equator of a sphere
 
-### Run Examples on Google Colab (Recommended) ###
-
-* You only need to have a google account to be able to run the notebooks on Colab. All the package installation will be handled within the notebook.
-
-1. Open a notebook in `examples` folder (Case00 - Case05)
-2. Click the button ![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg) at the top to open the notebook in Colab.
-3. Run the notebook by clicking `runtime/run all`(`Ctrl+F9`), or clicking the play button on the left of each cell to run the notebook cell-by-cell.
-
 ### Installation guide ###
 
 * This python package is based on python3, numpy, scipy, matplotlib, jupyter and shtools
